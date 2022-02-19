@@ -37,7 +37,6 @@ const Login = () => {
 
 
 const styles = {
-
     paperContainer: {
         display: 'flex',
         alignItems: 'center',
