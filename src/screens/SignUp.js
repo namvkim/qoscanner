@@ -1,31 +1,137 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../firebase";
+
 import TextField from "@mui/material/TextField";
 import Button from '@mui/material/Button';
 
 const SignUp = () => {
+    const navigate = useNavigate();
+
+    const formik = useFormik({
+        initialValues: {
+            name: '',
+            email: '',
+            password: '',
+            repassword: '',
+            resname: '',
+            address: '',
+        },
+        onSubmit: values => {
+            createUserWithEmailAndPassword(auth, values.email, values.password)
+                .then(() => {
+                    updateProfile(auth.currentUser, {
+                        displayName: formik.values.name,
+                        // phoneNumber: formik.values.resname,
+                        photoURL: formik.values.address
+                    })
+                }
+
+                    // navigate('login');
+                )
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                });
+        }
+    });
+
     return (
         <div style={styles.paperContainer}>
             <div style={styles.loginForm}>
-                <div style={styles.loginFormLogin}>
+                <form style={styles.loginFormLogin} onSubmit={formik.handleSubmit}>
                     <div style={styles.loginFormHeader}>
                         <img style={styles.loginFormLogo} alt='login-logo' src='./images/bg-login.png' />
                         <h2>QR SCANNER</h2>
                     </div>
                     <h3>Đăng ký</h3>
-                    <TextField required fullWidth type="text" variant="standard" label="Họ và tên" />
-                    <TextField required fullWidth type="email" variant="standard" label="Email" sx={{ mt: 2 }} />
-                    <TextField required fullWidth type="password" variant="standard" label="Mật khẩu" sx={{ mt: 2 }} />
-                    <TextField required fullWidth type="password" variant="standard" label="Nhập lại mật khẩu" sx={{ mt: 2 }} />
-                    <TextField required fullWidth type="text" variant="standard" label="Tên cửa hàng" sx={{ mt: 2 }} />
-                    <TextField required fullWidth type="text" variant="standard" label="Địa chỉ" sx={{ mt: 2 }} />
-
+                    <TextField
+                        variant="standard"
+                        required
+                        fullWidth
+                        id="name"
+                        label="Họ và tên"
+                        name="name"
+                        type='text'
+                        onChange={formik.handleChange}
+                        value={formik.values.name}
+                        error={false}
+                        helperText={false ? "fererjka" : " "}
+                    />
+                    <TextField
+                        variant="standard"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email"
+                        name="email"
+                        type="email"
+                        onChange={formik.handleChange}
+                        value={formik.values.email}
+                        error={false}
+                        helperText={false ? "fererjka" : " "}
+                    />
+                    <TextField
+                        variant="standard"
+                        required
+                        fullWidth
+                        id="password"
+                        label="Mật khẩu"
+                        name="password"
+                        type="password"
+                        onChange={formik.handleChange}
+                        value={formik.values.password}
+                        error={false}
+                        helperText={false ? "fererjka" : " "}
+                    />
+                    <TextField
+                        variant="standard"
+                        required
+                        fullWidth
+                        id="repassword"
+                        label="Nhập lại mật khẩu"
+                        name="repassword"
+                        type="password"
+                        onChange={formik.handleChange}
+                        value={formik.values.repassword}
+                        error={false}
+                        helperText={false ? "fererjka" : " "}
+                    />
+                    <TextField
+                        variant="standard"
+                        required
+                        fullWidth
+                        id="resname"
+                        label="Tên cửa hàng"
+                        name="resname"
+                        type="text"
+                        onChange={formik.handleChange}
+                        value={formik.values.resname}
+                        error={false}
+                        helperText={false ? "fererjka" : " "}
+                    />
+                    <TextField
+                        variant="standard"
+                        required
+                        fullWidth
+                        id="address"
+                        label="Địa chỉ"
+                        name="address"
+                        type="text"
+                        onChange={formik.handleChange}
+                        value={formik.values.address}
+                        error={false}
+                        helperText={false ? "fererjka" : " "}
+                    />
                     <div style={styles.LoginButton} >
-                        <Button style={styles.Button} href="# "> Đăng ký </Button>
+                        <Button style={styles.Button} type='submit'> Đăng ký </Button>
                     </div>
                     <div style={styles.Loginbottom}>
                         <span>Bạn đã có tài khoản?</span>
-                        <a style={styles.LinkBtn} href="/login">Đăng nhập</a>
+                        <Link to="/login" style={styles.LinkBtn}>Đăng nhập</Link>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     );
@@ -86,6 +192,7 @@ const styles = {
 
     Button: {
         marginTop: '40px',
+        marginBottom: '10px',
         backgroundColor: '#ECA64E',
         color: '#FFFF',
         padding: '12px 24px',

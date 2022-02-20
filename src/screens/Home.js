@@ -1,14 +1,20 @@
-
-import { Link } from "react-router-dom";
-
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
 
 const Home = () => {
+    const Signout = () => {
+        signOut(auth).then(() => {
+            console.log("sign out");
+        }).catch((error) => {
+
+        });
+    }
+
     return (
-        <ul className=" ">
-            <li> <Link to="/">HOME </Link> </li>
-            <li> <Link to="/login">LOG IN</Link> </li>
-            <li> <Link to="/signup">SIGN UP</Link> </li>
-        </ul>
+        <div>
+            <h1>hello {auth.currentUser.displayName}</h1>
+            <button onClick={() => Signout()}>logout</button>
+        </div>
     );
 }
 

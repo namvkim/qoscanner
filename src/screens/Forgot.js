@@ -1,21 +1,46 @@
+import { useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
 import TextField from "@mui/material/TextField";
 import Button from '@mui/material/Button';
 
 const Forgot = () => {
+    const navigate = useNavigate();
+
+    const formik = useFormik({
+        initialValues: {
+            email: '',
+        },
+        onSubmit: values => {
+            console.log(values);
+        }
+    });
+
     return (
         <div style={styles.paperContainer}>
             <div style={styles.loginForm}>
-                <div style={styles.loginFormLogin}>
+                <form style={styles.loginFormLogin} onSubmit={formik.handleSubmit}>
                     <div style={styles.loginFormHeader}>
                         <img style={styles.loginFormLogo} alt='login-logo' src='./images/bg-login.png' />
                         <h2>QR SCANNER</h2>
                     </div>
                     <h3>Quên mật khẩu</h3>
-                    <TextField required fullWidth type="email" variant="standard" label="Nhập email" />
+                    <TextField
+                        variant="standard"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email"
+                        name="email"
+                        type='email'
+                        onChange={formik.handleChange}
+                        value={formik.values.email}
+                        error={false}
+                        helperText={false ? "fererjka" : " "}
+                    />
                     <div style={styles.LoginButton} >
-                        <Button style={styles.Button} href="# "> Quên mật khẩu </Button>
+                        <Button style={styles.Button} type='submit'> Quên mật khẩu </Button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     );

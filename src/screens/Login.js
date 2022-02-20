@@ -1,40 +1,84 @@
+import { Link, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+import { useFormik } from "formik";
+
 import TextField from "@mui/material/TextField";
 import Button from '@mui/material/Button';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
-
 const Login = () => {
+    const navigate = useNavigate();
+
+    const formik = useFormik({
+        initialValues: {
+            email: '',
+            password: '',
+        },
+        onSubmit: values => {
+            signInWithEmailAndPassword(auth, values.email, values.password)
+                .then((userCredential) => {
+                    navigate('/');
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                });
+        }
+    });
 
     return (
         <div style={styles.paperContainer}>
             <div style={styles.loginForm}>
-                <div style={styles.loginFormLogin}>
+                <form style={styles.loginFormLogin} onSubmit={formik.handleSubmit}>
                     <div style={styles.loginFormHeader}>
                         <img style={styles.loginFormLogo} alt='login-logo' src='./images/bg-login.png' />
                         <h2>QR SCANNER</h2>
                     </div>
                     <h3>Đăng nhập</h3>
-                    <TextField style={styles.field} required fullWidth name="email"
-                        type="email" variant="standard" label="Email" />
-                    <TextField required fullWidth sx={{ mt: 2 }} type="password" variant="standard" label="Mật khẩu" />
+                    <TextField
+                        variant="standard"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email"
+                        name="email"
+                        type='email'
+                        onChange={formik.handleChange}
+                        value={formik.values.email}
+                        error={false}
+                        helperText={false ? "fererjka" : " "}
+                    />
+                    <TextField
+                        variant="standard"
+                        required
+                        fullWidth
+                        id="password"
+                        label="Mật khẩu"
+                        name="password"
+                        type='password'
+                        onChange={formik.handleChange}
+                        value={formik.values.password}
+                        error={false}
+                        helperText={false ? "fererjka" : " "}
+                    />
                     <div style={styles.loginFormCheck}>
                         <FormControlLabel control={<Checkbox />} label="Ghi nhớ tôi" />
-                        <a href="/forgot" style={styles.LinkBtn}>Quên mật khẩu?</a>
+                        <Link to="/forgot" style={styles.LinkBtn}>Quên mật khẩu?</Link>
                     </div>
                     <div style={styles.LoginButton} >
-                        <Button style={styles.Button} type="submit"   > Đăng nhập </Button>
+                        <Button style={styles.Button} type="submit"> Đăng nhập </Button>
                     </div>
                     <div style={styles.Loginbottom}>
                         <span>Bạn chưa có tài khoản?</span>
-                        <a style={styles.LinkBtn} href="/signup">Đăng ký</a>
+                        <Link to="/signup" style={styles.LinkBtn}>Đăng ký</Link>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     );
 };
-
 
 const styles = {
     paperContainer: {
@@ -80,7 +124,6 @@ const styles = {
     loginFormCheck: {
         display: 'flex',
         justifyContent: 'space-around',
-        marginTop: '20px',
     },
 
     LoginButton: {
@@ -90,6 +133,7 @@ const styles = {
 
     Button: {
         marginTop: '25px',
+        marginBottom: '10px',
         backgroundColor: '#ECA64E',
         color: '#FFFF',
         padding: '12px 24px',
