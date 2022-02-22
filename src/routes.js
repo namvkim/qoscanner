@@ -4,6 +4,8 @@ import SignUp from './screens/SignUp';
 import Forgot from './screens/Forgot';
 import NotFound from './screens/NotFound';
 import FormAddMenu from './screens/FormAddMenu';
+import MenuOwner from './screens/MenuOwner';
+import ShowMenu from './screens/ShowMenu';
 
 const routes = [
   {
@@ -34,7 +36,7 @@ const routes = [
   {
     path: "/createmenu",
     exact: true,
-    main: <FormAddMenu />,
+    main: <MenuOwner />,
   },
 ];
 
