@@ -1,25 +1,24 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useFormik } from "formik";
-import {useState} from 'react';
-
+import React from 'react';
 import TextField from "@mui/material/TextField";
 import Button from '@mui/material/Button';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import { flexbox } from "@mui/system";
-import { blue } from "@mui/material/colors";
-import { colors } from "@mui/material";
 
 const FormAddMenu = () => {
     const navigate = useNavigate();
-    
+
+    const [category, setCategory] = React.useState('');
+
+    const handleChange = (event) => {
+        setCategory(event.target.value);
+    };
     const formik = useFormik({
         initialValues: {
             image: '',
@@ -28,7 +27,7 @@ const FormAddMenu = () => {
             category: '',
             desciption: '',
         },
-        
+
         onSubmit: values => {
             signInWithEmailAndPassword(auth, values.image, values.name, values.price, values.category, values.desciption)
                 .then((userCredential) => {
@@ -55,40 +54,15 @@ const FormAddMenu = () => {
             <div style={styles.AddForm}>
                 <form style={styles.AddFormMenu} onSubmit={formik.handleSubmit}>
                     <h4>Thêm sản phẩm</h4>
-                    <div style = {styles.image}>
-                    <InputLabel id="image">Hình ảnh</InputLabel>
-                    <FormControl sx={{ minWidth: 150 }}>
-                        <TextField
-                            required
-                            fullWidth
-                            id="image"
-                            name="image"
-                            type='file'
-                            border = "hidden"
-                            onChange={formik.handleChange}
-                            value={formik.values.image}
-                            error={false}
-                            helperText={false ? "fererjka" : " "}
-                        />
-                    </FormControl>
-                    
-                    
-                    </div>
                     <div style={styles.row2}>
-                        <div>
-                            <InputLabel id="name">Tên sản phẩm</InputLabel>
+                        <div >
+                            <InputLabel id="name" style={styles.tensp}>Tên sản phẩm</InputLabel>
                             <FormControl sx={{ width: 600 }}>
-                            <TextField
-                                required
-                                id="name"
-                                name="name"
-                                type='text'
-                                placeholder="Nhập tên sản phẩm"
-                                onChange={formik.handleChange}
-                                value={formik.values.name}
-                                error={false}
-                                helperText={false ? "fererjka" : " "}
-                            />
+                                <TextField
+                                    required
+                                    size="small"
+                                    placeholder="Nhập tên sản phẩm"
+                                />
                             </FormControl>
                         </div>
                         &ensp;&ensp;
@@ -101,6 +75,7 @@ const FormAddMenu = () => {
                                     id="price"
                                     name="price"
                                     type='number'
+                                    size="small"
                                     placeholder="Nhập giá sản phẩm"
                                     onChange={formik.handleChange}
                                     value={formik.values.price}
@@ -116,21 +91,43 @@ const FormAddMenu = () => {
                                 <Select
                                     variant="outlined"
                                     required
-                                    value={formik.values.category}
-                                    onChange={formik.handleChange}
-                                    >
+                                    height="10px"
+                                    value={category}
+                                    label="Danh mục"
+                                    size="small"
+                                    onChange={handleChange}
+                                >
                                     <MenuItem value={10}>Món khai vị</MenuItem>
                                     <MenuItem value={20}>Đồ uống</MenuItem>
                                 </Select>
                             </FormControl>
                         </div>
-                    
-                    
                     </div>
-                    <InputLabel id="desciption" variant="standard">Mô tả</InputLabel>
-                    <TextareaAutosize
-                        style={{ width: 600}}
-                        minRows={5}/>
+                    <div style={styles.image}>
+                        <div>
+                            <InputLabel id="desciption" >Mô tả</InputLabel>
+                            <TextareaAutosize
+                                style={{ width: 600 }}
+                                minRows={5} />&ensp;&ensp;
+                        </div>
+                        <div>
+                            <InputLabel id="image">Hình ảnh</InputLabel>
+                            <FormControl sx={{ minWidth: 150, border: "white" }}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="image"
+                                    name="image"
+                                    type='file'
+                                    onChange={formik.handleChange}
+                                    value={formik.values.image}
+                                    error={false}
+                                    helperText={false ? "fererjka" : " "}
+                                />
+                            </FormControl></div>
+
+                    </div>
+
                     <div style={styles.Button} >
                         <Button style={styles.CancelButton} type="submit"> Hủy </Button>
                         &ensp;&ensp;
@@ -140,11 +137,14 @@ const FormAddMenu = () => {
             </div>
             <hr></hr>
         </div>
-        
+
     );
 };
 
 const styles = {
+    image: {
+        display: 'flex',
+    },
     paperContainer: {
         backgroundColor: '#FFFFFF',
         marginLeft: 'auto',
@@ -182,9 +182,9 @@ const styles = {
         color: '#FFFFFF',
         width: '80px',
         height: '30px',
-        
+
     },
-    CancelButton:{
+    CancelButton: {
         border: '#848484 1px solid',
         color: '#848484',
         width: '80px',
@@ -192,3 +192,61 @@ const styles = {
     }
 };
 export default FormAddMenu;
+
+
+// import * as React from 'react';
+// import Box from '@mui/material/Box';
+// import TextField from '@mui/material/TextField';
+
+// export default function FormAddMenu() {
+//   return (
+//     <Box
+//       component="form"
+//       sx={{
+//         '& .MuiTextField-root': { m: 1, width: '25ch' },
+//       }}
+//       noValidate
+//       autoComplete="off"
+//     >
+//       <div>
+//         <TextField
+//           label="Size"
+//           id="outlined-size-small"
+//           defaultValue="Small"
+//           size="small"
+//         />
+//         <TextField label="Size" id="outlined-size-normal" defaultValue="Normal" />
+//       </div>
+//       <div>
+//         <TextField
+//           label="Size"
+//           id="filled-size-small"
+//           defaultValue="Small"
+//           variant="filled"
+//           size="small"
+//         />
+//         <TextField
+//           label="Size"
+//           id="filled-size-normal"
+//           defaultValue="Normal"
+//           variant="filled"
+//         />
+//       </div>
+//       <div>
+//         <TextField
+//           label="Size"
+//           id="standard-size-small"
+//           defaultValue="Small"
+//           size="small"
+//           variant="standard"
+//         />
+//         <TextField
+//           label="Size"
+//           id="standard-size-normal"
+//           defaultValue="Normal"
+//           variant="standard"
+//         />
+//       </div>
+//     </Box>
+//   );
+// }
