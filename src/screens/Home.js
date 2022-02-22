@@ -12,7 +12,7 @@ const Home = () => {
 
     return (
         <div>
-            <h1>hello {auth.currentUser.displayName}</h1>
+            <h1>hello {auth.currentUser?.displayName}</h1>
             <button onClick={() => Signout()}>logout</button>
         </div>
     );

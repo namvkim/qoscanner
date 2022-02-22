@@ -1,58 +1,98 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useFormik } from "formik";
+import * as Yup from "yup";
 
-import TextField from "@mui/material/TextField";
-import Button from '@mui/material/Button';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
+import { TextField, Button, FormControlLabel, Checkbox } from "@mui/material";
+import LoadingComponent from "../components/LoadingComponent";
+import DialogComponent from "../components/DialogComponent";
 
 const Login = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [dialog, setDialog] = useState(false);
+    const [authData, setAuthData] = useState();
 
     const formik = useFormik({
         initialValues: {
             email: '',
             password: '',
         },
+        validationSchema: Yup.object({
+            email: Yup.string()
+                .email("Địa chỉ Email không hợp lệ")
+                .required("Nhập một địa chỉ Email"),
+            password: Yup.string()
+                .min(8, "Sử dụng 8 ký tự trở lên")
+                .required("Nhập mật khẩu"),
+        }),
         onSubmit: values => {
+            setLoading(true);
             signInWithEmailAndPassword(auth, values.email, values.password)
                 .then((userCredential) => {
+                    setLoading(false);
                     navigate('/');
                 })
                 .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
+                    if (error.code === "auth/user-not-found") {
+                        setAuthData({
+                            type: "error",
+                            message: "Tài khoản Email không đúng. Vui lòng thử lại bằng Email khác!"
+                        });
+                    } else if (error.code === "auth/wrong-password") {
+                        setAuthData({
+                            type: "error",
+                            message: "Mật khẩu của bạn không đúng!"
+                        });
+                    } else if (error.code === "auth/too-many-requests") {
+                        setAuthData({
+                            type: "error",
+                            message: "Vui lòng thử lại sau vài phút!"
+                        });
+                    } else if (error.code === "auth/network-request-failed") {
+                        setAuthData({
+                            type: "error",
+                            message: "Vui lòng kiểm tra mạng Internet!"
+                        });
+                    } else {
+                        setAuthData({
+                            type: "error",
+                            message: "Lỗi hệ thống!"
+                        });
+                    }
+                    setDialog(true);
+                    setLoading(false);
                 });
-        }
+        },
     });
 
     return (
         <div style={styles.paperContainer}>
+            {loading && <LoadingComponent />}
             <div style={styles.loginForm}>
                 <form style={styles.loginFormLogin} onSubmit={formik.handleSubmit}>
                     <div style={styles.loginFormHeader}>
-                        <img style={styles.loginFormLogo} alt='login-logo' src='./images/bg-login.png' />
-                        <h2>QR SCANNER</h2>
+                        <img style={styles.loginFormLogo} alt='login-logo' src='./images/logo.png' />
+                        <h4 style={styles.loginFormApp}>QR SCANNER</h4>
                     </div>
-                    <h3>Đăng nhập</h3>
+                    <div style={styles.loginFormTitle}>Đăng nhập</div>
                     <TextField
                         variant="standard"
-                        required
                         fullWidth
                         id="email"
                         label="Email"
                         name="email"
-                        type='email'
+                        type='text'
                         onChange={formik.handleChange}
                         value={formik.values.email}
-                        error={false}
-                        helperText={false ? "fererjka" : " "}
+                        error={formik.errors.email && formik.touched.email}
+                        helperText={formik.errors.email && formik.touched.email && formik.errors.email}
+                        sx={{ marginBottom: 1 }}
                     />
                     <TextField
                         variant="standard"
-                        required
                         fullWidth
                         id="password"
                         label="Mật khẩu"
@@ -60,8 +100,9 @@ const Login = () => {
                         type='password'
                         onChange={formik.handleChange}
                         value={formik.values.password}
-                        error={false}
-                        helperText={false ? "fererjka" : " "}
+                        error={formik.errors.password && formik.touched.password}
+                        helperText={formik.errors.password && formik.touched.password && formik.errors.password}
+                        sx={{ marginBottom: 1 }}
                     />
                     <div style={styles.loginFormCheck}>
                         <FormControlLabel control={<Checkbox />} label="Ghi nhớ tôi" />
@@ -70,17 +111,19 @@ const Login = () => {
                     <div style={styles.LoginButton} >
                         <Button style={styles.Button} type="submit"> Đăng nhập </Button>
                     </div>
-                    <div style={styles.Loginbottom}>
+                    <div style={styles.Loginbottom} >
                         <span>Bạn chưa có tài khoản?</span>
                         <Link to="/signup" style={styles.LinkBtn}>Đăng ký</Link>
                     </div>
                 </form>
+                <DialogComponent isOpen={dialog} setDialog={setDialog} authData={authData} />
             </div>
         </div>
     );
 };
 
 const styles = {
+
     paperContainer: {
         display: 'flex',
         alignItems: 'center',
@@ -93,8 +136,6 @@ const styles = {
     },
 
     loginForm: {
-        width: '450px',
-        minHeight: '500px',
         backgroundColor: '#FFFFFF',
         marginLeft: 'auto',
         marginRight: '15%',
@@ -103,27 +144,38 @@ const styles = {
     },
 
     loginFormLogin: {
-        width: 'auto',
-        height: '100%',
-        margin: '20px',
+        width: 400,
+        margin: '20px 40px',
     },
 
     loginFormLogo: {
-        width: '100px',
-        minHeight: '100px',
-        borderRadius: '50%',
-        marginRight: '25px',
+        width: '20px',
+        minHeight: '20px',
+        marginRight: 16
+    },
+
+    loginFormApp: {
+        color: 'grey'
     },
 
     loginFormHeader: {
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'start',
+    },
+
+    loginFormTitle: {
+        textAlign: 'center',
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#ECA64E',
+        marginTop: 16,
+        marginBottom: 24
     },
 
     loginFormCheck: {
         display: 'flex',
         justifyContent: 'space-around',
+        alignItems: 'center'
     },
 
     LoginButton: {
@@ -146,6 +198,9 @@ const styles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        fontSize: 12,
+        fontWeight: 500,
+        color: 'grey'
     },
 
     LinkBtn: {

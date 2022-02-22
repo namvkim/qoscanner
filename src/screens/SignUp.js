@@ -1,14 +1,18 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
+import * as Yup from "yup";
 
-import TextField from "@mui/material/TextField";
-import Button from '@mui/material/Button';
+import { TextField, Button } from "@mui/material";
+import LoadingComponent from "../components/LoadingComponent";
+import DialogComponent from "../components/DialogComponent";
 
 const SignUp = () => {
-    const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false);
+    const [dialog, setDialog] = useState(false);
+    const [authData, setAuthData] = useState();
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -18,37 +22,77 @@ const SignUp = () => {
             resname: '',
             address: '',
         },
+        validationSchema: Yup.object({
+            name: Yup.string()
+                .min(2, "Ít nhất 2 kí tự")
+                .max(30, "Tối đa 30 kí tự")
+                .required("Nhập tên của bạn"),
+            email: Yup.string()
+                .email("Địa chỉ Email không hợp lệ")
+                .required("Chọn một địa chỉ Email"),
+            password: Yup.string()
+                .min(8, "Sử dụng 8 ký tự trở lên")
+                .required("Nhập mật khẩu"),
+            repassword: Yup.string()
+                .oneOf([Yup.ref("password")], "Mật khẩu không trùng khớp")
+                .required("Nhập lại mật khẩu"),
+            resname: Yup.string()
+                .required("Nhập tên cửa hàng"),
+            address: Yup.string()
+                .required("Nhập địa chỉ cửa hàng"),
+        }),
         onSubmit: values => {
+            setLoading(true);
             createUserWithEmailAndPassword(auth, values.email, values.password)
                 .then(() => {
-                    updateProfile(auth.currentUser, {
-                        displayName: formik.values.name,
-                        // phoneNumber: formik.values.resname,
-                        photoURL: formik.values.address
-                    })
-                }
-
-                    // navigate('login');
-                )
+                    setAuthData({
+                        type: "success",
+                        path: "/",
+                        message: "Đăng ký tài khoản thành công. Hãy tạo Menu và mã QR cho cửa hàng của bạn."
+                    });
+                    setDialog(true);
+                    setLoading(false);
+                })
                 .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
+                    if (error.code === "auth/email-already-in-use") {
+                        setAuthData({
+                            type: "error",
+                            message: "Email này đã được sử dụng. Vui lòng đăng ký bằng một Email khác!"
+                        });
+                    } else if (error.code === "auth/too-many-requests") {
+                        setAuthData({
+                            type: "error",
+                            message: "Vui lòng thử lại sau vài phút!"
+                        });
+                    } else if (error.code === "auth/network-request-failed") {
+                        setAuthData({
+                            type: "error",
+                            message: "Vui lòng kiểm tra mạng Internet!"
+                        });
+                    } else {
+                        setAuthData({
+                            type: "error",
+                            message: "Lỗi hệ thống!"
+                        });
+                    }
+                    setDialog(true);
+                    setLoading(false);
                 });
         }
     });
 
     return (
         <div style={styles.paperContainer}>
+            {loading && <LoadingComponent />}
             <div style={styles.loginForm}>
                 <form style={styles.loginFormLogin} onSubmit={formik.handleSubmit}>
                     <div style={styles.loginFormHeader}>
-                        <img style={styles.loginFormLogo} alt='login-logo' src='./images/bg-login.png' />
-                        <h2>QR SCANNER</h2>
+                        <img style={styles.loginFormLogo} alt='login-logo' src='./images/logo.png' />
+                        <h4 style={styles.loginFormApp}>QR SCANNER</h4>
                     </div>
-                    <h3>Đăng ký</h3>
+                    <div style={styles.loginFormTitle}>Đăng ký tài khoản</div>
                     <TextField
                         variant="standard"
-                        required
                         fullWidth
                         id="name"
                         label="Họ và tên"
@@ -56,25 +100,25 @@ const SignUp = () => {
                         type='text'
                         onChange={formik.handleChange}
                         value={formik.values.name}
-                        error={false}
-                        helperText={false ? "fererjka" : " "}
+                        error={formik.errors.name && formik.touched.name}
+                        helperText={formik.errors.name && formik.touched.name && formik.errors.name}
+                        sx={{ marginBottom: 1 }}
                     />
                     <TextField
                         variant="standard"
-                        required
                         fullWidth
                         id="email"
                         label="Email"
                         name="email"
-                        type="email"
+                        type='text'
                         onChange={formik.handleChange}
                         value={formik.values.email}
-                        error={false}
-                        helperText={false ? "fererjka" : " "}
+                        error={formik.errors.email && formik.touched.email}
+                        helperText={formik.errors.email && formik.touched.email && formik.errors.email}
+                        sx={{ marginBottom: 1 }}
                     />
                     <TextField
                         variant="standard"
-                        required
                         fullWidth
                         id="password"
                         label="Mật khẩu"
@@ -82,12 +126,12 @@ const SignUp = () => {
                         type="password"
                         onChange={formik.handleChange}
                         value={formik.values.password}
-                        error={false}
-                        helperText={false ? "fererjka" : " "}
+                        error={formik.errors.password && formik.touched.password}
+                        helperText={formik.errors.password && formik.touched.password && formik.errors.password}
+                        sx={{ marginBottom: 1 }}
                     />
                     <TextField
                         variant="standard"
-                        required
                         fullWidth
                         id="repassword"
                         label="Nhập lại mật khẩu"
@@ -95,12 +139,12 @@ const SignUp = () => {
                         type="password"
                         onChange={formik.handleChange}
                         value={formik.values.repassword}
-                        error={false}
-                        helperText={false ? "fererjka" : " "}
+                        error={formik.errors.repassword && formik.touched.repassword}
+                        helperText={formik.errors.repassword && formik.touched.repassword && formik.errors.repassword}
+                        sx={{ marginBottom: 1 }}
                     />
                     <TextField
                         variant="standard"
-                        required
                         fullWidth
                         id="resname"
                         label="Tên cửa hàng"
@@ -108,12 +152,12 @@ const SignUp = () => {
                         type="text"
                         onChange={formik.handleChange}
                         value={formik.values.resname}
-                        error={false}
-                        helperText={false ? "fererjka" : " "}
+                        error={formik.errors.resname && formik.touched.resname}
+                        helperText={formik.errors.resname && formik.touched.resname && formik.errors.resname}
+                        sx={{ marginBottom: 1 }}
                     />
                     <TextField
                         variant="standard"
-                        required
                         fullWidth
                         id="address"
                         label="Địa chỉ"
@@ -121,8 +165,9 @@ const SignUp = () => {
                         type="text"
                         onChange={formik.handleChange}
                         value={formik.values.address}
-                        error={false}
-                        helperText={false ? "fererjka" : " "}
+                        error={formik.errors.address && formik.touched.address}
+                        helperText={formik.errors.address && formik.touched.address && formik.errors.address}
+                        sx={{ marginBottom: 1 }}
                     />
                     <div style={styles.LoginButton} >
                         <Button style={styles.Button} type='submit'> Đăng ký </Button>
@@ -132,6 +177,7 @@ const SignUp = () => {
                         <Link to="/login" style={styles.LinkBtn}>Đăng nhập</Link>
                     </div>
                 </form>
+                <DialogComponent isOpen={dialog} setDialog={setDialog} authData={authData} />
             </div>
         </div>
     );
@@ -163,20 +209,32 @@ const styles = {
     loginFormLogin: {
         width: 'auto',
         height: '100%',
-        margin: '20px',
+        margin: '20px 40px',
     },
 
     loginFormLogo: {
-        width: '100px',
-        minHeight: '100px',
-        borderRadius: '50%',
-        marginRight: '25px',
+        width: '20px',
+        minHeight: '20px',
+        marginRight: 16
+    },
+
+    loginFormApp: {
+        color: 'grey'
     },
 
     loginFormHeader: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'start',
+    },
+
+    loginFormTitle: {
+        textAlign: 'center',
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#ECA64E',
+        marginTop: 16,
+        marginBottom: 24
     },
 
     loginFormCheck: {
@@ -191,7 +249,7 @@ const styles = {
     },
 
     Button: {
-        marginTop: '40px',
+        marginTop: '25px',
         marginBottom: '10px',
         backgroundColor: '#ECA64E',
         color: '#FFFF',
@@ -205,6 +263,9 @@ const styles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        fontSize: 12,
+        fontWeight: 500,
+        color: 'grey'
     },
 
     LinkBtn: {
