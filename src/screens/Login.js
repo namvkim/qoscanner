@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
@@ -11,9 +11,13 @@ import DialogComponent from "../components/DialogComponent";
 
 const Login = () => {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [dialog, setDialog] = useState(false);
     const [authData, setAuthData] = useState();
+
+    useEffect(() => {
+        setLoading(false);
+    }, []);
 
     const formik = useFormik({
         initialValues: {
@@ -32,7 +36,6 @@ const Login = () => {
             setLoading(true);
             signInWithEmailAndPassword(auth, values.email, values.password)
                 .then((userCredential) => {
-                    setLoading(false);
                     navigate('/');
                 })
                 .catch((error) => {
@@ -69,56 +72,56 @@ const Login = () => {
     });
 
     return (
-        <div style={styles.paperContainer}>
-            {loading && <LoadingComponent />}
-            <div style={styles.loginForm}>
-                <form style={styles.loginFormLogin} onSubmit={formik.handleSubmit}>
-                    <div style={styles.loginFormHeader}>
-                        <img style={styles.loginFormLogo} alt='login-logo' src='./images/logo.png' />
-                        <h4 style={styles.loginFormApp}>QR SCANNER</h4>
-                    </div>
-                    <div style={styles.loginFormTitle}>Đăng nhập</div>
-                    <TextField
-                        variant="standard"
-                        fullWidth
-                        id="email"
-                        label="Email"
-                        name="email"
-                        type='text'
-                        onChange={formik.handleChange}
-                        value={formik.values.email}
-                        error={formik.errors.email && formik.touched.email}
-                        helperText={formik.errors.email && formik.touched.email && formik.errors.email}
-                        sx={{ marginBottom: 1 }}
-                    />
-                    <TextField
-                        variant="standard"
-                        fullWidth
-                        id="password"
-                        label="Mật khẩu"
-                        name="password"
-                        type='password'
-                        onChange={formik.handleChange}
-                        value={formik.values.password}
-                        error={formik.errors.password && formik.touched.password}
-                        helperText={formik.errors.password && formik.touched.password && formik.errors.password}
-                        sx={{ marginBottom: 1 }}
-                    />
-                    <div style={styles.loginFormCheck}>
-                        <FormControlLabel control={<Checkbox />} label="Ghi nhớ tôi" />
-                        <Link to="/forgot" style={styles.LinkBtn}>Quên mật khẩu?</Link>
-                    </div>
-                    <div style={styles.LoginButton} >
-                        <Button style={styles.Button} type="submit"> Đăng nhập </Button>
-                    </div>
-                    <div style={styles.Loginbottom} >
-                        <span>Bạn chưa có tài khoản?</span>
-                        <Link to="/signup" style={styles.LinkBtn}>Đăng ký</Link>
-                    </div>
-                </form>
-                <DialogComponent isOpen={dialog} setDialog={setDialog} authData={authData} />
+        loading ? <LoadingComponent /> :
+            <div style={styles.paperContainer}>
+                <div style={styles.loginForm}>
+                    <form style={styles.loginFormLogin} onSubmit={formik.handleSubmit}>
+                        <div style={styles.loginFormHeader}>
+                            <img style={styles.loginFormLogo} alt='login-logo' src='./images/logo.png' />
+                            <h4 style={styles.loginFormApp}>QR SCANNER</h4>
+                        </div>
+                        <div style={styles.loginFormTitle}>Đăng nhập</div>
+                        <TextField
+                            variant="standard"
+                            fullWidth
+                            id="email"
+                            label="Email"
+                            name="email"
+                            type='text'
+                            onChange={formik.handleChange}
+                            value={formik.values.email}
+                            error={formik.errors.email && formik.touched.email}
+                            helperText={formik.errors.email && formik.touched.email && formik.errors.email}
+                            sx={{ marginBottom: 1 }}
+                        />
+                        <TextField
+                            variant="standard"
+                            fullWidth
+                            id="password"
+                            label="Mật khẩu"
+                            name="password"
+                            type='password'
+                            onChange={formik.handleChange}
+                            value={formik.values.password}
+                            error={formik.errors.password && formik.touched.password}
+                            helperText={formik.errors.password && formik.touched.password && formik.errors.password}
+                            sx={{ marginBottom: 1 }}
+                        />
+                        <div style={styles.loginFormCheck}>
+                            <FormControlLabel control={<Checkbox />} label="Ghi nhớ tôi" />
+                            <Link to="/forgot" style={styles.LinkBtn}>Quên mật khẩu?</Link>
+                        </div>
+                        <div style={styles.LoginButton} >
+                            <Button style={styles.Button} type="submit"> Đăng nhập </Button>
+                        </div>
+                        <div style={styles.Loginbottom} >
+                            <span>Bạn chưa có tài khoản?</span>
+                            <Link to="/signup" style={styles.LinkBtn}>Đăng ký</Link>
+                        </div>
+                    </form>
+                    <DialogComponent isOpen={dialog} setDialog={setDialog} authData={authData} />
+                </div>
             </div>
-        </div>
     );
 };
 

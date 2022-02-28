@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth } from "../firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useFormik } from "formik";
@@ -9,9 +9,14 @@ import LoadingComponent from '../components/LoadingComponent';
 import DialogComponent from "../components/DialogComponent";
 
 const Forgot = () => {
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [dialog, setDialog] = useState(false);
     const [authData, setAuthData] = useState();
+
+    useEffect(() => {
+        setLoading(false);
+    }, []);
+
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -62,35 +67,35 @@ const Forgot = () => {
     });
 
     return (
-        <div style={styles.paperContainer}>
-            {loading && <LoadingComponent />}
-            <div style={styles.loginForm}>
-                <form style={styles.loginFormLogin} onSubmit={formik.handleSubmit}>
-                    <div style={styles.loginFormHeader}>
-                        <img style={styles.loginFormLogo} alt='login-logo' src='./images/logo.png' />
-                        <h4 style={styles.loginFormApp}>QR SCANNER</h4>
-                    </div>
-                    <div style={styles.loginFormTitle}>Quên mật khẩu</div>
-                    <TextField
-                        variant="standard"
-                        fullWidth
-                        id="email"
-                        label="Email"
-                        name="email"
-                        type='text'
-                        onChange={formik.handleChange}
-                        value={formik.values.email}
-                        error={formik.errors.email && formik.touched.email}
-                        helperText={formik.errors.email && formik.touched.email && formik.errors.email}
-                        sx={{ marginBottom: 1 }}
-                    />
-                    <div style={styles.LoginButton} >
-                        <Button style={styles.Button} type='submit'> Gửi mật khẩu mới </Button>
-                    </div>
-                </form>
-                <DialogComponent isOpen={dialog} setDialog={setDialog} authData={authData} />
+        loading ? <LoadingComponent /> :
+            <div style={styles.paperContainer}>
+                <div style={styles.loginForm}>
+                    <form style={styles.loginFormLogin} onSubmit={formik.handleSubmit}>
+                        <div style={styles.loginFormHeader}>
+                            <img style={styles.loginFormLogo} alt='login-logo' src='./images/logo.png' />
+                            <h4 style={styles.loginFormApp}>QR SCANNER</h4>
+                        </div>
+                        <div style={styles.loginFormTitle}>Quên mật khẩu</div>
+                        <TextField
+                            variant="standard"
+                            fullWidth
+                            id="email"
+                            label="Email"
+                            name="email"
+                            type='text'
+                            onChange={formik.handleChange}
+                            value={formik.values.email}
+                            error={formik.errors.email && formik.touched.email}
+                            helperText={formik.errors.email && formik.touched.email && formik.errors.email}
+                            sx={{ marginBottom: 1 }}
+                        />
+                        <div style={styles.LoginButton} >
+                            <Button style={styles.Button} type='submit'> Gửi mật khẩu mới </Button>
+                        </div>
+                    </form>
+                    <DialogComponent isOpen={dialog} setDialog={setDialog} authData={authData} />
+                </div>
             </div>
-        </div>
     );
 }
 

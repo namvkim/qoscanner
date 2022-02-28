@@ -6,9 +6,10 @@ const DialogComponent = (props) => {
     const { isOpen, authData, setDialog } = props;
 
     const onClose = () => {
-        setDialog(false);
         if (authData?.type === "success") {
             navigate(authData?.path)
+        } else {
+            setDialog(false);
         }
     }
 

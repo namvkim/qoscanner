@@ -1,9 +1,9 @@
-import { CircularProgress } from "@mui/material";
+import ReactLoading from 'react-loading';
 
 const LoadingComponent = () => {
     return (
         <div style={styles.container}>
-            <CircularProgress color="warning" />
+            <ReactLoading type="bars" color="#ECA64E" width={50} />
         </div>
     )
 }
@@ -13,12 +13,15 @@ const styles = {
         height: '100vh',
         width: '100vw',
         backgroundColor: 'white',
-        position: 'absolute',
+        position: 'fixed',
         zIndex: 100,
         display: 'flex',
+        left: 0,
+        top: 0,
         justifyContent: 'center',
-        alignItems: 'center'
-    }
+        alignItems: 'center',
+    },
 }
+
 
 export default LoadingComponent;
