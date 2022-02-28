@@ -1,163 +1,304 @@
 import * as React from 'react';
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
+import PropTypes from 'prop-types';
+import { alpha } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
-import Switch from '@mui/material/Switch';
-import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
-import ModeEditOutlinedIcon from '@mui/icons-material/ModeEditOutlined';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
+import Switch from '@mui/material/Switch';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ModeEditOutlinedIcon from '@mui/icons-material/ModeEditOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import InputBase from '@mui/material/InputBase';
+import SearchIcon from '@mui/icons-material/Search';
+import { withStyles } from "@material-ui/core/styles";
+import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 
-const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+function createData( name, category, price, pic) {
+    return {
+      name,
+      category,
+      price,
+      pic
+    };
+  }
+  
+  const rows = [
+      createData('Frozen yoghurt', 'A', 6.0, 'https://www.petcity.vn/media/news/920_cat5_500x462.jpg'),
+      createData('Ice ream sandwich', 'A', 9,  'https://vnn-imgs-f.vgcloud.vn/2021/09/07/09/chu-meo-noi-tieng-mang-xa-hoi-voi-phong-cach-thoi-trang-sanh-dieu.jpeg'),
+      createData('Eclai', 'M', 6,   'https://fridaycat.com.vn/wp-content/uploads/2021/04/meo-muop-giong-meo-pho-bien-tren-the-gioi.jpg'),
+      createData('Gingerbread', 'B', 15, ),
+  ];
+
+function stableSort(array) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  return stabilizedThis.map((el) => el[0]);
+}
+
+const headCells = [
+    {
+    id: 'pic',
+    numeric: false,
+    label: 'Hình ảnh',
+    },
+  {
+    id: 'name',
+    numeric: false,
+    label: 'Tên',
+  },
+  {
+    id: 'category',
+    numeric: false,
+    label: 'Danh mục',
+  },
+  {
+    id: 'price',
+    numeric: true,
+    label: 'Giá(VNĐ)',
+  },
+  {
+    id: 'status',
+    numeric: false,
+    label: 'Trạng thái',
+  },
+  {
+    id: 'edit',
+    numeric: false,
+    label: 'Chỉnh sửa',
+  },
+  {
+    id: 'delete',
+    numeric: false,
+    label: 'Xóa',
+  },
+];
+
+function ShowMenuHead(props) {
+  const { onSelectAllClick, orderBy, numSelected, rowCount } =
+    props;
+
+  return (
+    <TableHead>
+      <TableRow>
+        <TableCell padding="checkbox">
+          <Checkbox
+            color="primary"
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={onSelectAllClick}
+            inputProps={{
+              'aria-label': 'select all desserts',
+            }}
+          />
+        </TableCell>
+        {headCells.map((headCell) => (
+          <TableCell
+            key={headCell.id}
+            align= 'left'
+          >
+            <TableSortLabel
+            >
+              {headCell.label}
+              {orderBy === headCell.id }
+            </TableSortLabel>
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  );
+}
+
+ShowMenuHead.propTypes = {
+  numSelected: PropTypes.number.isRequired,
+  onSelectAllClick: PropTypes.func.isRequired,
+  orderBy: PropTypes.string.isRequired,
+  rowCount: PropTypes.number.isRequired,
+};
+
+const Menu = (props) => {
+  const { numSelected } = props;
+  return (
+    <Toolbar
+      sx={{
+        pl: { sm: 2 },
+        pr: { xs: 1, sm: 1 },
+        ...(numSelected > 0 && {
+          bgcolor: (theme) =>
+            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+        }),
+      }}
+    >
+      {numSelected > 0 ? (
+        <Typography
+          sx={{ flex: '1 1 100%' }}
+          color="inherit"
+          variant="subtitle1"
+          component="div"
+        >
+          Xóa {numSelected} sản phẩm
+        </Typography>
+      ) : (
+        <Typography
+          sx={{ flex: '1 1 100%' }}
+          variant="h6"
+          id="tableSearch"
+          component="div"
+        >
+          <div  style={{display: 'flex', alignItems: 'center',  }} >
+            <Paper  className={numSelected.searchContainer}  
+                    sx={{ p: '2px 4px',maxWidth:'40%', display: 'flex', alignItems: 'center', boxShadow:'none' , border:'0.1px solid #CACFD2' }} >
+                    <InputBase  sx={{ ml: 1, flex: 1 ,  minWidth: '40%' }} placeholder="Tìm theo tên sản phẩm"
+                        inputProps={{ 'aria-label': 'Tìm kiếm' }} />
+                    <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
+                        <SearchIcon />
+                    </IconButton>
+                </Paper>
+                <Paper sx={{ p: '12px 10px',ml:'20px', display: 'flex', alignItems: 'center' ,boxShadow:'none', border:'0.1px solid #CACFD2', borderRadius:'4px'}}>
+                    <ReplayOutlinedIcon />
+                </Paper>
+          </div>
+        </Typography>
+      )}
+      {numSelected > 0 ? (
+        <Tooltip title="Delete">
+          <Button variant="outlined" startIcon={<DeleteIcon />}>
+              Xóa
+            </Button>
+        </Tooltip>
+      ) : (
+        <Tooltip title="Danh sách">
+          <IconButton>
+            <FilterListIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Toolbar>
+  );
+};
+
+Menu.propTypes = {
+  numSelected: PropTypes.number.isRequired,
+};
 
 const styles = theme => ({
     root: {
     width: "100%",
-    height: "100vh",
+    height:"85%",
     marginTop: theme.spacing.unit * 3,
-    overflowY: "auto"
-  },
-  table: {
-    minWidth: 700
-  },
-  tableRow: {
-    "&$hover:hover": {
-      backgroundColor: "#D5DBDB"
-    }
-  },
-  icon: {
-    "$hover:focus &": {
-      color: "red"
-    }
-  },
-  hover: {},
-  search: {
-    margin:'30px',
-    border: '1px solid',
-    borderRadius:'27px',
-    width: '360px',
+    overflowY: "auto",
 },
-deletes : {
-    marginLeft: '30px',
-}, 
-searchContainer: {
-  display:'flex',
-  alignItems:'center'
-}
-});
-
-let id = 0;
-function createData(name, category, price,  img) {
-    id += 1;
-    return { id, name, category, price,  img };  
-}
-
-const rows = [
-    createData('Eclair', 262, 16.0,   'https://fridaycat.com.vn/wp-content/uploads/2021/04/meo-muop-giong-meo-pho-bien-tren-the-gioi.jpg'),
-    createData('Frozen yoghurt', 159, 6.0, 'https://www.petcity.vn/media/news/920_cat5_500x462.jpg'),
-    createData('Ice cream sandwich', 237, 9.0,  'https://vnn-imgs-f.vgcloud.vn/2021/09/07/09/chu-meo-noi-tieng-mang-xa-hoi-voi-phong-cach-thoi-trang-sanh-dieu.jpeg'),
-    createData('Cupcake', 305, 3.7,  ),
-  ];
+})
+ 
 
 const ShowMenu =(props)=> {
-const [auth, setAuth] = React.useState(false);
 const { classes } = props;
-const handleChange = (event) => {
-    setAuth(event.target.checked);
+  const [selected, setSelected] = React.useState([]);
+
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelecteds = rows.map((n) => n.name);
+      setSelected(newSelecteds);
+      return;
+    }
+    setSelected([]);
   };
 
+  const handleClick = (event, name) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      );
+    }
+
+    setSelected(newSelected);
+  };
+
+  const isSelected = (name) => selected.indexOf(name) !== -1;
+
   return (
-    <div>
-         <div className={classes.searchContainer} >
-            <Paper className={classes.search}  component="form"
-                sx={{ p: '2px 4px', display: 'flex', alignItems: 'center',}} >
-        
-                <InputBase  sx={{ ml: 1, flex: 1 ,  minWidth: 300 }} placeholder="Tìm theo tên sản phẩm"
-                    inputProps={{ 'aria-label': 'Tìm kiếm' }} />
-                <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
-                    <SearchIcon />
-                </IconButton>
-            </Paper>
-            {auth  && (
-                    <div  className={classes.deletes} > 
-                      <Button variant="outlined" startIcon={<DeleteIcon />}>
-                      Xóa
-                    </Button>  
-                  </div>
-            )}
-         </div>
-         
-        <Paper className={classes.root}>
-            <Table className={classes.table}>
-                <TableHead>
-                <TableRow>
-                <TableCell >      
-                        <Checkbox {...label} 
-                        checked={auth}  onChange={handleChange} 
-                        // onChange={handleOnChange}
-                        // checked={isChecked} 
+    <Box sx={{ width: '100%', height:'100vh' }}>
+        <Menu numSelected={selected.length} />
+      <Paper sx={{ width: '100%', mb: 2 }} className={classes.root}>
+        <TableContainer>
+          <Table
+            sx={{ minWidth: 750 }}
+            aria-labelledby="tableSearch"
+            size='medium'
+          >
+            <ShowMenuHead
+              numSelected={selected.length}
+              onSelectAllClick={handleSelectAllClick}
+              rowCount={rows.length}
+            />
+            <TableBody>
+              {stableSort(rows
+              )
+                .map((row, index) => {
+                  const isItemSelected = isSelected(row.name);
+                  const labelId = `enhanced-table-checkbox-${index}`;
+
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.name}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                             onClick={(event) => handleClick(event, row.name)}
+                            inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
                         />
-                    </TableCell>
-                    <TableCell align="center"><b>Hình ảnh</b></TableCell>
-                    <TableCell align="left"><b>Tên</b></TableCell>
-                    <TableCell align="center"><b>Danh mục</b></TableCell>
-                    <TableCell align="center"><b>Giá&nbsp;(VĐN)</b></TableCell>
-                    <TableCell align="center"><b>Trạng thái</b></TableCell>
-                    <TableCell align="center"><b>Chỉnh sửa</b></TableCell>
-                    <TableCell align="center"><b>Xóa</b></TableCell>
-                </TableRow>
-                </TableHead>
-                <TableBody>
-                    {rows.map(row => (
-                    <TableRow  hover key={row.id} classes={{ hover: classes.hover }}
-                     className={classes.tableRow}  >
-                        <TableCell  >  
-                            <Checkbox {...label} 
-                            checked={auth?"checked":""}
-                            // checked={row.selected}
-                            />
-                            
-                        </TableCell>
-                        <TableCell  className={classes.tableCell} align="center" >
-                            <img src={row.img} alt=""  height='50' width='50' />
-                        </TableCell>
-                        <TableCell  className={classes.tableCell} scope="row" align="left">
-                            {row.name}
-                        </TableCell>
-                        <TableCell className={classes.tableCell} align="center">
-                            {row.category}
-                        </TableCell>
-                        <TableCell className={classes.tableCell} align="center">
-                            {row.price}
-                        </TableCell>
-                        <TableCell className={classes.tableCell} align="center">
-                            <Switch edge="end"/>
-                        </TableCell>
-                        <TableCell className={classes.tableCell} align="center">
-                            <ModeEditOutlinedIcon />                        
-                        </TableCell>
-                        <TableCell className={classes.tableCell} align="center"> 
-                            <DeleteIcon /> 
-                        </TableCell>
+                      </TableCell>
+                      <TableCell component="th"id={labelId} >
+                             <img src={row.pic} alt=""  height='50' width='60' />
+                      </TableCell>
+                      <TableCell   scope="row"  >  {row.name} </TableCell>
+                      <TableCell >{row.category}</TableCell>
+                      <TableCell >{row.price}</TableCell>
+                      <TableCell><Switch edge="end"  /></TableCell>
+                      <TableCell >
+                      <ModeEditOutlinedIcon />
+                      </TableCell>
+                      <TableCell >
+                        <DeleteOutlinedIcon />                       
+                      </TableCell>
                     </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </Paper>
-    </div>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+    </Box>
   );
 }
 
 ShowMenu.propTypes = {
-  classes: PropTypes.object.isRequired
-};
-
-export default withStyles(styles)(ShowMenu);
+    classes: PropTypes.object.isRequired
+  };
+  
+  export default withStyles(styles)(ShowMenu);
