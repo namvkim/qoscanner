@@ -1,10 +1,9 @@
 import {React, useState, useEffect } from "react";
-import { TextField, Button, FormControlLabel, Checkbox } from "@mui/material";
+import { TextField, Button, Checkbox } from "@mui/material";
 import LoadingComponent from "../components/LoadingComponent";
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
-import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -63,7 +62,7 @@ function createData( name, calories, fat, carbs, protein) {
   
     return (
         loading ? <LoadingComponent /> :
-            <div> 
+            <div className={classes.Container} > 
                 <div className={classes.paperContainer}>
                     <TextField
                             variant="outlined"
@@ -73,7 +72,7 @@ function createData( name, calories, fat, carbs, protein) {
                             type='text'
                             sx={{ marginRight: 2 }}
                     />
-                    <Button className={classes.createQRButton} >
+                    <Button style={style.createQRButton} type='submit'>
                         Tạo mã
                     </Button>
                 </div>
@@ -94,57 +93,74 @@ function createData( name, calories, fat, carbs, protein) {
                             </MenuItem>
                         ))}
                         </TextField> 
-                        <Paper sx={{width:'50%', p: '2px 4px',display: 'flex', alignItems: 'center', boxShadow:'none' , border:'0.1px solid #CACFD2' }} >
-                                <InputBase  sx={{ ml: 1, flex: 1 }} placeholder="Nhập từ khóa tìm kiếm"
-                                    inputProps={{ 'aria-label': 'Tìm kiếm' }} />
-                                <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
-                                    <SearchIcon />
-                                </IconButton>
-                        </Paper>
+                        <TextField
+                            variant="outlined"
+                            id="outlined-basic"
+                            label="Nhập từ khóa tìm kiếm"
+                            type='text' inputProps={{ 'aria-label': 'Tìm kiếm' }}
+                        >
+                        </TextField>
+                        <IconButton className={classes.searhButton} type="submit"  aria-label="search">
+                            <SearchIcon />
+                        </IconButton>
                     </div>
                     <TableContainer component={Paper} className={classes.scroll}>
-                    <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-                        <TableHead className={classes.tableHead}>
-                        <TableRow>
-                            <TableCell>
-                                <Checkbox color="primary"  />STT
-                            </TableCell>
-                            <TableCell align="left">Số bàn</TableCell>
-                            <TableCell align="center">Tải xuống</TableCell>
-                            <TableCell align="center">Xóa</TableCell>
-                        </TableRow>
-                        </TableHead>
-                           
-                        <TableBody   >
-                        {rows.map((row, index) => (
-                            <TableRow
-                            key={row.name}
-                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
-                            <TableCell align="left">
+                        <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                            <TableHead className={classes.tableHead}>
+                            <TableRow>
+                                <TableCell>
+                                    <Checkbox color="primary"  />STT
+                                </TableCell>
+                                <TableCell align="left">Số bàn</TableCell>
+                                <TableCell align="center">Tải xuống</TableCell>
+                                <TableCell align="center">Xóa</TableCell>
+                            </TableRow>
+                            </TableHead>
+                            <TableBody   >
+                            {rows.map((row, index) => (
+                                <TableRow
+                                key={row.name}
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                >
+                                <TableCell align="left">
                                     <Checkbox color="primary" className={classes.checkb} />{index+1}         
                                 </TableCell>
-                            <TableCell align="left">{row.name}</TableCell>
-                            <TableCell align="center"> 
-                                <FileDownloadOutlinedIcon />
-                            </TableCell>
-                            <TableCell align="center">
-                            <DeleteOutlinedIcon />   
-                            </TableCell>
-                            </TableRow>
-                        ))}
-                        </TableBody>
-                    </Table>
+                                <TableCell align="left">{row.name}</TableCell>
+                                <TableCell align="center"> 
+                                    <Button className={classes.iconCLolor}>
+                                        <FileDownloadOutlinedIcon />
+                                    </Button> 
+                                </TableCell>
+                                <TableCell align="center">
+                                    <Button className={classes.iconCLolor}>
+                                        <DeleteOutlinedIcon />
+                                    </Button>   
+                                </TableCell>
+                                </TableRow>
+                            ))}
+                            </TableBody>
+                        </Table>
                     </TableContainer>
                 </div>
             </div>
     )
 }
 
+const style = {
+    createQRButton: {
+        backgroundColor: '#F0CC62',
+        color: '#FFFFFF',
+        width: '120px',
+        height: '56px',
+    }
+}
 const styles = theme => ({
+    Container: {
+        height:'calc(100vh - 48px)',
+    },
     scroll: {
         width: "100%",
-        height:"48vh",
+        height:'calc(100vh - 320px)',
         marginTop: theme.spacing.unit * 3,
         overflowY: "auto",
     },
@@ -171,13 +187,22 @@ const styles = theme => ({
         display: 'flex',
         marginTop:'16px',
     },
+    searhButton: {
+        borderRadius: '4px',
+        border:'1px solid #CACFD2',
+    },
     createQRButton: {
         backgroundColor: '#F0CC62',
         color: '#FFFFFF',
         width: '120px',
         height: '56px',
     },
+    iconCLolor: {
+        color: '#F0CC62',
+
+    }
 })
+
 CreateQRCode.propTypes = {
     classes: PropTypes.object.isRequired
   };
