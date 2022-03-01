@@ -2,22 +2,49 @@ import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useFormik } from "formik";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import TextField from "@mui/material/TextField";
 import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
+import { Alert } from "@mui/material";
+import {storage } from '../firebase'
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import ProductDataService from "../services/product.service";
 
-const FormAddMenu = () => {
+const FormAddMenu = ({ id, setProductId }) => {
     const navigate = useNavigate();
+    const [name, setName] = useState("");
+    const [price, setPrice] = useState("");
+    const [description, setDescription] = useState("");
+    const [image, setImage] = useState(null);
+    const [imgURL, setImgURL] = useState(null);
+    const [flag, setFlag] = useState(true);
+    const [message, setMessage] = useState({ error: false, msg: "" });
 
     const [category, setCategory] = React.useState('');
 
-    const handleChange = (event) => {
-        setCategory(event.target.value);
+    const categories = [
+        {
+          value: 'USD',
+          label: 'Món khai vị',
+        },
+        {
+          value: 'EUR',
+          label: 'Món tráng miệng',
+        },
+        {
+          value: 'BTC',
+          label: 'Món dùng',
+        },
+       
+      ];
+    const handleChange = (e) => {
+        setCategory(e.target.value);
+        if(e.target.files[0]) { 
+            setImage(e.target.files[0]);
+          }
     };
     const formik = useFormik({
         initialValues: {
@@ -39,28 +66,148 @@ const FormAddMenu = () => {
                 });
         }
     });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setMessage("");
+        if (name === "" || price === "" || category === "" || image === null || description === null) {
+          setMessage({ error: true, msg: "All fields are mandatory!" });
+          return;
+        }
+      
+            // Create the file metadata
+          /** @type {any} */
+          const metadata = {
+            contentType: 'image/jpeg'
+          };
+    
+          // Upload file and metadata to the object 'images/mountains.jpg'
+          const storageRef = ref(storage, 'images/' + image.name);
+          const uploadTask = uploadBytesResumable(storageRef, image, metadata);
+    
+          // Listen for state changes, errors, and completion of the upload.
+          uploadTask.on('state_changed',
+            (snapshot) => {
+              // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log('Upload is ' + progress + '% done');
+              switch (snapshot.state) {
+                case 'paused':
+                  console.log('Upload is paused');
+                  break;
+                case 'running':
+                  console.log('Upload is running');
+                  break;
+              }
+            }, 
+            (error) => {
+              // A full list of error codes is available at
+              // https://firebase.google.com/docs/storage/web/handle-errors
+              switch (error.code) {
+                case 'storage/unauthorized':
+                  // User doesn't have permission to access the object
+                  break;
+                case 'storage/canceled':
+                  // User canceled the upload
+                  break;
+                case 'storage/unknown':
+                  // Unknown error occurred, inspect error.serverResponse
+                  break;
+              }
+            }, 
+            () => {
+              // Upload completed successfully, now we can get the download URL
+              getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                console.log('File available at', downloadURL);
+                const newProduct = {
+                  name:name,
+                  price: price,
+                  category: category,
+                  descrition: description,
+                  image: downloadURL,
+                };
+                console.log(newProduct);
+                try {
+                  if (id !== undefined && id !== "") {
+                    ProductDataService.updateProduct(id, newProduct);
+                    setProductId("");
+                    setMessage({ error: false, msg: "Updated successfully!" });
+                  } else {
+                    ProductDataService.addProducts(newProduct);
+                    setMessage({ error: false, msg: "New Product added successfully!" });
+                  }
+                } catch (err) {
+                  setMessage({ error: true, msg: err.message });
+                }
+                
+              });
+            }
+          );
+        setName("");
+        setPrice("");
+        setCategory("");
+        setDescription("");
+        setImgURL("");
+      };
+      
+  const editHandler = async () => {
+    setMessage("");
+    try {
+      const docSnap = await ProductDataService.getProduct(id);
+      console.log("The record is :", docSnap.data());
+      setName(docSnap.data().name);
+      setPrice(docSnap.data().price);
+      setCategory(docSnap.data().category);
+      setDescription(docSnap.data().desciption);
+      setImage(docSnap.data().imgURL);  
+    } catch (err) {
+      setMessage({ error: true, msg: err.message });
+    }
+  };
 
+  useEffect(() => {
+    console.log("The id here is : ", id);
+    if (id !== undefined && id !== "") {
+      editHandler();
+    }
+  }, [id]);
+    
     return (
         <div style={styles.paperContainer}>
+            
             <div style={styles.headerAddMenu}>
-                <div id="title-add-menu"><h4>Tạo menu</h4></div>
-                <div style={styles.account}>
-                    <div style={styles.accountName}>John Smith</div>
+                <div id="title-add-menu"  style={styles.headerAddTitle}>
+                    Tạo menu
+                </div>
+                <div style={styles.headerInfo}>
+                    <div>John Smith</div>
+                    <i class="fas fa-angle-down" style={styles.headerIcon} > </i>
                     &ensp;
                     <img style={styles.accountLogo} alt='account-logo' src='./images/account.jpg' />
                 </div>
             </div>
-            <hr></hr>
+
             <div style={styles.AddForm}>
+
+                {message?.msg && (
+                <Alert
+                    variant={message?.error ? "danger" : "success"}
+                    dismissible
+                    onClose={() => setMessage("")}
+                >
+                {message?.msg}
+                </Alert>
+                )}
                 <form style={styles.AddFormMenu} onSubmit={formik.handleSubmit}>
-                    <h4>Thêm sản phẩm</h4>
-                    <div style={styles.row2}>
+                    <div style={styles.AddHeading}>Thêm sản phẩm</div>
+                    <div style={styles.AddRow2}>
                         <div >
                             <InputLabel id="name" style={styles.tensp}>Tên sản phẩm</InputLabel>
-                            <FormControl sx={{ width: 600 }}>
+                            
+                            <FormControl sx={{ width:  600, marginTop: 1}}>
                                 <TextField
                                     required
                                     size="small"
+                                    name="name"
                                     placeholder="Nhập tên sản phẩm"
                                 />
                             </FormControl>
@@ -68,7 +215,7 @@ const FormAddMenu = () => {
                         &ensp;&ensp;
                         <div>
                             <InputLabel id="price">Giá</InputLabel>
-                            <FormControl sx={{ width: 210 }}>
+                            <FormControl sx={{ width:  210, marginTop: 1 }}>
                                 <TextField
                                     variant="outlined"
                                     required
@@ -87,32 +234,42 @@ const FormAddMenu = () => {
                         &ensp;&ensp;
                         <div>
                             <InputLabel htmlFor="uncontrolled-native">Danh mục</InputLabel>
-                            <FormControl sx={{ width: 210 }}>
-                                <Select
-                                    variant="outlined"
-                                    required
-                                    height="10px"
+                            <FormControl sx={{ width: 210, marginTop: 1 }}>
+                                <TextField
+                                    id="outlined-select-currency-native"
+                                    select
                                     value={category}
-                                    label="Danh mục"
-                                    size="small"
                                     onChange={handleChange}
-                                >
-                                    <MenuItem value={10}>Món khai vị</MenuItem>
-                                    <MenuItem value={20}>Đồ uống</MenuItem>
-                                </Select>
+                                    size="small"
+                                    name="category"
+                                    SelectProps={{
+                                        native: true,
+                                    }}
+                                   
+                                    variant="outlined"
+                                    >
+                                    {categories.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                        {option.label}
+                                        </option>
+                                    ))}
+                                </TextField>
                             </FormControl>
                         </div>
                     </div>
-                    <div style={styles.image}>
+                    <div style={styles.AddRow3}>
                         <div>
-                            <InputLabel id="desciption" >Mô tả</InputLabel>
+                            <InputLabel id="desciption" >Mô tả sản phẩm</InputLabel>
                             <TextareaAutosize
-                                style={{ width: 600 }}
-                                minRows={5} />&ensp;&ensp;
+                                style={{ width:  600, marginTop: "7px" }}
+                                minRows={5} 
+                                name="description"
+                                
+                                />&ensp;&ensp;
                         </div>
                         <div>
                             <InputLabel id="image">Hình ảnh</InputLabel>
-                            <FormControl sx={{ minWidth: 150, border: "white" }}>
+                            <FormControl sx={{ width:  300, border: "white" , marginTop: 1}}>
                                 <TextField
                                     required
                                     fullWidth
@@ -142,9 +299,6 @@ const FormAddMenu = () => {
 };
 
 const styles = {
-    image: {
-        display: 'flex',
-    },
     paperContainer: {
         backgroundColor: '#FFFFFF',
         marginLeft: 'auto',
@@ -153,42 +307,73 @@ const styles = {
 
     headerAddMenu: {
         display: 'flex',
+        alignItems: 'center',
+        padding: '10px 0',
+        
     },
+    headerAddTitle: {
+        fontSize: '22px',
+        fontWeight: '500',
+        lineHeight: '30px',
 
+    },
+    headerInfo: {
+        display: 'flex',
+        alignItems: 'center',
+        marginLeft: 'auto',
+        marginRight: '40px'
+    },
+    headerIcon: {
+        marginLeft: '10px',
+    },
     accountLogo: {
         height: '41px',
         borderRadius: '41px',
     },
-    accountName: {
-        marginTop: '10px',
+
+    AddHeading: {
+        backgroundColor: '#f6f8f8',
+        padding: '15px 20px',
+        fontSize: '18px',
+        fontWeight:'bold',
+    },
+    
+   
+
+    AddRow2: {
+        display: 'flex',
+        padding: '20px 20px 0 20px',
+       
     },
 
-    account: {
-        marginLeft: '82%',
-        marginTop: '15px',
+
+    AddRow3: {
         display: 'flex',
-    },
-    row2: {
-        display: 'flex',
+        padding: '15px 20px',
+        
+      
     },
     Button: {
         display: 'flex',
         justifyContent: 'right',
-        marginRight: '10px',
+        marginTop: '10px',
+        
     },
     AddButton: {
-        border: '#848484 1px solid',
+        
         backgroundColor: '#307DD2',
         color: '#FFFFFF',
-        width: '80px',
-        height: '30px',
+        width: '120px',
+        height: '42px',
+        marginRight: '40px',
+      
 
     },
     CancelButton: {
         border: '#848484 1px solid',
         color: '#848484',
-        width: '80px',
-        height: '30px',
+        width: '120px',
+        height: '42px',
     }
 };
 export default FormAddMenu;
