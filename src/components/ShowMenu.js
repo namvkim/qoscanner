@@ -325,8 +325,8 @@ const  ShowMenu = (props) => {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
     const label = { inputProps: { 'aria-label': 'Switch demo' } };
   return (
-    <Box sx={{ width: '100%' }} className={classes.scroll}>
-      <Paper  sx={{ width: '100%', mb: 2 }}>
+    <Box sx={{ width: '100%' }} >
+      <Paper className={classes.scroll}  sx={{ width: '100%', mb: 2 }}>
         <ShowMenuToolbar numSelected={selected.length} />
         <TableContainer >
           <Table
