@@ -14,6 +14,8 @@ import {storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import ProductDataService from "../services/product.service";
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
+import Select from '@mui/material/Select';
+
 
 const FormAddMenu = ({ id, setProductId }) => {
     const navigate = useNavigate();
@@ -44,9 +46,7 @@ const FormAddMenu = ({ id, setProductId }) => {
       ];
     const handleChange = (e) => {
         setCategory(e.target.value);
-        if(e.target.files[0]) { 
-            setImage(e.target.files[0]);
-          }
+      
     };
     const formik = useFormik({
         initialValues: {
@@ -85,31 +85,31 @@ const FormAddMenu = ({ id, setProductId }) => {
                     <img style={styles.accountLogo} alt='account-logo' src='./images/account.jpg' />
                 </div>
             </div>
-            <div style={styles.headerHeading}>
-                  Thêm Món
-            </div>
+          
             <div style={styles.AddForm}>
               <form onSubmit={formik.handleSubmit}>
                   <div style={styles.AddFormHeading}>
-                    <TextField id="outlined-basic" label="Nhập tên sản phẩm" variant="outlined"  style={styles.AddFormName} />
-                    <TextField id="outlined-basic" label="Giá sản phẩm" variant="outlined" style={styles.AddFormPrice} />
-                    <TextField
-                      id="outlined-select-category"
-                      select
-                      label="Danh mục sản phẩm"
-                      value={category}
-                      onChange={handleChange}
-                      style={styles.AddFormCategory}
-                    >
-                      {categories.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
+                    <TextField id="outlined-basic" label="Nhập tên sản phẩm" variant="outlined" size="small" style={styles.AddFormName} />
+                    <TextField id="outlined-basic" label="Giá sản phẩm" variant="outlined" size="small" style={styles.AddFormPrice} />
+              
+                    <FormControl size="small"  style={styles.AddFormCategory}>
+                      <InputLabel id="demo-simple-select-label">Danh mục</InputLabel>
+                      <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={category}
+                        label="Danh mục"
+                        onChange={handleChange}
+                      >
+                        <MenuItem value={10}>Ten</MenuItem>
+                        <MenuItem value={20}>Twenty</MenuItem>
+                        <MenuItem value={30}>Thirty</MenuItem>
+                      </Select>
+                    </FormControl>
                   </div> 
                   <div style={styles.AddFormDescrip}>
                     <TextareaAutosize
+
                     aria-label="minimum height"
                     minRows={5}
                     placeholder="Mô tả sản phẩm"
@@ -117,6 +117,7 @@ const FormAddMenu = ({ id, setProductId }) => {
                     />
 
                     <TextField
+                      size="small"
                       name="upload-photo"
                       type="file"
                       style={styles.AddFormImage}
@@ -143,15 +144,7 @@ const styles = {
         padding: '12px 0',
         backgroundColor: '#fff',   
     },
-    headerHeading: {
-      display: 'flex',
-      alignItems: 'center',
-      padding: '10px 30px',
-      backgroundColor: '#F6F8F8',
-      fontSize: '18px',
-      fontWeight: '550',
-      border: '1px solid #e8e8e8', 
-    },
+ 
     headerAddTitle: {
         fontSize: '22px',
         fontWeight: '500',
@@ -186,27 +179,27 @@ const styles = {
       padding: '25px', 
     },
     AddFormName: {
-      width: '35%',
+      width: '30%',
       marginRight: '20px',
      
     },
     AddFormPrice: {
-      width: '20%',
+      width: '15%',
       marginRight: '20px',
      
     },
     AddFormCategory: {
-      width: '20%',
+      width: '15%',
       marginRight: '20px',
     },
     AddFormDes: {
-      width: '46%',
+      width: '38.5%',
       marginRight: '20px',
       fontSize: '16px',
       fontWeight: '400',
     },
     AddFormImage: {
-      width: '30.5%',
+      width: '23%',
     },
     Button: {
         display: 'flex',
