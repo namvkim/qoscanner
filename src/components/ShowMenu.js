@@ -219,9 +219,9 @@ const EnhancedTableToolbar = (props) => {
           component="div"
         >
           <div  style={{display: 'flex', alignItems: 'center',  }} >
-                <Paper  className={numSelected.searchContainer}  
+                <Paper  className={numSelected.searchContainer}  size="small" 
                     sx={{ p: '2px 4px',maxWidth:'60%', display: 'flex', alignItems: 'center', boxShadow:'none' , border:'0.1px solid #CACFD2' }} >
-                    <InputBase  sx={{ ml: 1, flex: 1 ,  minWidth: '60%' }} placeholder="Tìm theo tên sản phẩm"
+                    <InputBase  sx={{ ml: 1, flex: 1 ,  minWidth: '60%' }} placeholder="Tìm theo tên sản phẩm" 
                            
 
                         inputProps={{ 'aria-label': 'Tìm kiếm' }} />
@@ -376,7 +376,7 @@ export default function EnhancedTable() {
                         {row.name}
                       </TableCell>
                       <TableCell component="th"id={labelId} >
-                             <img  align="right" src={row.image} alt=""  height='60' width='80' style={{ borderRadius: "3px" }} />
+                             <img  align="right" src={row.image} alt=""  height='50' width='60' style={{ borderRadius: "3px" }} />
                       </TableCell>
                       <TableCell align="right">{row.categories}</TableCell>
                       <TableCell align="right">{row.price}</TableCell>
