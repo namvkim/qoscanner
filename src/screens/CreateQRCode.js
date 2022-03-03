@@ -64,7 +64,7 @@ function createData( name, calories, fat, carbs, protein) {
         loading ? <LoadingComponent /> :
             <div className={classes.Container} > 
                 <div className={classes.paperContainer}>
-                    <TextField
+                    <TextField size="small"
                             variant="outlined"
                             fullWidth
                             id="outlined-basic"
@@ -82,7 +82,7 @@ function createData( name, calories, fat, carbs, protein) {
                         <TextField
                             sx={{ marginRight: 2 }}
                             id="outlined-select-currency"
-                            select
+                            select size="small"
                             label="Lọc mã"
                             value={currency}
                             onChange={handleChange}
@@ -93,7 +93,7 @@ function createData( name, calories, fat, carbs, protein) {
                             </MenuItem>
                         ))}
                         </TextField> 
-                        <TextField
+                        <TextField size="small"
                             variant="outlined"
                             id="outlined-basic"
                             label="Nhập từ khóa tìm kiếm"
@@ -151,16 +151,17 @@ const style = {
         backgroundColor: '#F0CC62',
         color: '#FFFFFF',
         width: '120px',
-        height: '56px',
+        height: '40px',
     }
 }
 const styles = theme => ({
     Container: {
+        // backgroundColor: '#F0CC62',
         height:'calc(100vh - 48px)',
     },
     scroll: {
         width: "100%",
-        height:'calc(100vh - 320px)',
+        height:'calc(100vh - 288px)',
         marginTop: theme.spacing.unit * 3,
         overflowY: "auto",
     },
@@ -190,15 +191,10 @@ const styles = theme => ({
     searhButton: {
         borderRadius: '4px',
         border:'1px solid #CACFD2',
-    },
-    createQRButton: {
-        backgroundColor: '#F0CC62',
-        color: '#FFFFFF',
-        width: '120px',
-        height: '56px',
+        height:'40px',
     },
     iconCLolor: {
-        color: '#F0CC62',
+        color: '#000',
 
     }
 })
