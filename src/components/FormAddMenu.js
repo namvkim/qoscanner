@@ -101,9 +101,11 @@ const FormAddMenu = ({ id, setProductId }) => {
                         label="Danh mục"
                         onChange={handleChange}
                       >
-                        <MenuItem value={10}>Ten</MenuItem>
-                        <MenuItem value={20}>Twenty</MenuItem>
-                        <MenuItem value={30}>Thirty</MenuItem>
+                       {categories.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                            </MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                   </div> 
@@ -199,7 +201,7 @@ const styles = {
       fontWeight: '400',
     },
     AddFormImage: {
-      width: '23%',
+      width: '22.7%',
     },
     Button: {
         display: 'flex',
