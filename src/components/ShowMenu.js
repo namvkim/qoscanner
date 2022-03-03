@@ -8,7 +8,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,7 +16,6 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -54,36 +52,6 @@ const rows = [
   createData('Nougat', 360,  37.000, 'https://cdn.huongnghiepaau.com/wp-content/uploads/2017/08/07a60d255a852413ae4590c15b587eaa.jpg'),
   createData('Oreo', 437,  400.000, 'https://cdn.huongnghiepaau.com/wp-content/uploads/2017/08/07a60d255a852413ae4590c15b587eaa.jpg'),
 ];
-
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-// This method is created for cross-browser compatibility, if you don't
-// need to support IE11, you can use Array.prototype.sort() directly
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
 
 const headCells = [
   {
@@ -305,18 +273,6 @@ const  ShowMenu = (props) => {
     setSelected(newSelected);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
@@ -326,9 +282,9 @@ const  ShowMenu = (props) => {
     const label = { inputProps: { 'aria-label': 'Switch demo' } };
   return (
     <Box sx={{ width: '100%' }} >
-      <Paper className={classes.scroll}  sx={{ width: '100%', mb: 2 }}>
+      <Paper sx={{ width: '100%', mb: 2 }} >
         <ShowMenuToolbar numSelected={selected.length} />
-        <TableContainer >
+        <TableContainer  className={classes.scroll}  >
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
@@ -345,9 +301,8 @@ const  ShowMenu = (props) => {
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
-              {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
+             
+                {rows.map((row, index) => {
                   const isItemSelected = isSelected(row.name);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -397,15 +352,7 @@ const  ShowMenu = (props) => {
                     </TableRow>
                   );
                 })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
+              
             </TableBody>
           </Table>
         </TableContainer>
@@ -419,8 +366,10 @@ const styles = theme => ({
  
   scroll: {
     width: '100%',
+    height:'calc(100vh - 510px)',
     marginTop: theme.spacing.unit * 3,
-    overflowY: 'auto',
+    overflowY: 'scroll',
+ 
   },
 });
 ShowMenu.propTypes = {
