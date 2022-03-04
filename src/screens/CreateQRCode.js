@@ -34,7 +34,7 @@ const CreateQRCode = (props) => {
         },
         validationSchema: Yup.object({
             numberTable: Yup.string()
-                // .numberTable("Địa chỉ Email không hợp lệ")
+                // .numberTable(" ")
                 .required("Nhập vào số bàn"),
         }),
         onSubmit: values => {
@@ -190,11 +190,8 @@ const style = {
 }
 const styles = theme => ({
     Container: {
-        // backgroundColor: 'yellow',
         backgroundColor: '#E5E5E5',
         height:'100vh',
-        // padding:'0px 20px',
-        // height:'calc(100vh - 48px)',
     },
     scroll: {
         width: "100%",
@@ -214,12 +211,11 @@ const styles = theme => ({
     paperContainer: {
         display: 'flex',
         padding: '15px',
-        backgroundColor:'white',
+        backgroundColor:'#FFFFFF',
         margin:'16px 15px',
-        // marginBottom:'16px',
     },
     paperContainer2: {
-        backgroundColor:'white',
+        backgroundColor:'#FFFFFF',
         margin:'16px 15px',
         padding: '15px',
     },
@@ -233,7 +229,7 @@ const styles = theme => ({
         
         display: 'flex',
         padding: '0 15px',
-        backgroundColor:'white',
+        backgroundColor:'#FFFFFF',
         alignItems:'center',
         justifyContent:'space-between',
     },
@@ -248,7 +244,6 @@ const styles = theme => ({
     },
     iconCLolor: {
         color: '#000',
-
     }
 })
 
