@@ -15,6 +15,10 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from 'prop-types';
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const CreateQRCode = (props) => {
     const { classes } = props;
@@ -24,29 +28,48 @@ const CreateQRCode = (props) => {
         setLoading(false);
     }, []);
 
-const currencies = [
-    {
-        value: '1',
-        label: 'Mã 1',
-    },
-    {
-        value: '2',
-        label: 'Mã 2',
-    },
-    {
-        value: '3',
-        label: 'Mã 3',
-    },
-    ];
- const [currency, setCurrency] = useState('1');
+    const formik = useFormik({
+        initialValues: {
+            numberTable: '',
+        },
+        validationSchema: Yup.object({
+            numberTable: Yup.string()
+                // .numberTable("Địa chỉ Email không hợp lệ")
+                .required("Nhập vào số bàn"),
+        }),
+        onSubmit: values => {
+            setLoading(true);
+            console.log(values);
+             
+        }
+    });
+    const currencies = [
+        {
+            value: 'all',
+            label: 'Tất cả mã',
+        },
+        {
+            value: '1',
+            label: 'Mã 1',
+        },
+        {
+            value: '2',
+            label: 'Mã 2',
+        },
+        {
+            value: '3',
+            label: 'Mã 3',
+        },
+        ];
+    const [currency, setCurrency] = useState('all');
 
   const handleChange = (event) => {
     setCurrency(event.target.value);
   };
   
-function createData( name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
-  }
+    function createData( name, calories, fat, carbs, protein) {
+        return { name, calories, fat, carbs, protein };
+    }
   
   const rows = [
     createData( 'Frozen yoghurt', 159, 6.0, 24, 4.0),
@@ -63,24 +86,34 @@ function createData( name, calories, fat, carbs, protein) {
     return (
         loading ? <LoadingComponent /> :
             <div className={classes.Container} > 
-                <div className={classes.paperContainer}>
+                <div className={classes.paperTitle} >
+                     <div className={classes.Title}  >Tạo mã QR</div>
+                     <Stack direction="row" spacing={2} alignItems="center">
+                        <div>John</div>                      
+                        <Avatar alt="avatar restaurant" src="https://pdp.edu.vn/wp-content/uploads/2021/05/hinh-anh-dai-dien-avt-anime-1.jpg" />
+                    </Stack>
+                </div>
+                <form className={classes.paperContainer} onSubmit={formik.handleSubmit}>
                     <TextField size="small"
                             variant="outlined"
                             fullWidth
-                            id="outlined-basic"
-                            label="Nhập số bàn"
-                            type='text'
-                            sx={{ marginRight: 2 }}
+                            id="numberTable"
+                            name="numberTable"
+                            label="Nhập số bàn" onChange={formik.handleChange}
+                            value={formik.values.numberTable}
+                            error={formik.errors.numberTable && formik.touched.numberTable}
+                            helperText={ formik.touched.numberTable && formik.errors.numberTable}
+                            type="text"
+                            sx={{ marginRight: 2}}
                     />
                     <Button style={style.createQRButton} type='submit'>
                         Tạo mã
                     </Button>
-                </div>
+                </form>
                 <div  className={classes.paperContainer2}>
-                    <div>Tất cả mã</div>
                     <div className={classes.searchContainer}>
                         <TextField
-                            sx={{ marginRight: 2 }}
+                            sx={{ marginRight: 4 , width:'20%'}}
                             id="outlined-select-currency"
                             select size="small"
                             label="Lọc mã"
@@ -95,6 +128,7 @@ function createData( name, calories, fat, carbs, protein) {
                         </TextField> 
                         <TextField size="small"
                             variant="outlined"
+                            sx={{  width:'40%'}}
                             id="outlined-basic"
                             label="Nhập từ khóa tìm kiếm"
                             type='text' inputProps={{ 'aria-label': 'Tìm kiếm' }}
@@ -156,13 +190,16 @@ const style = {
 }
 const styles = theme => ({
     Container: {
-        // backgroundColor: '#F0CC62',
-        height:'calc(100vh - 48px)',
+        // backgroundColor: 'yellow',
+        backgroundColor: '#E5E5E5',
+        height:'100vh',
+        // padding:'0px 20px',
+        // height:'calc(100vh - 48px)',
     },
     scroll: {
         width: "100%",
-        height:'calc(100vh - 288px)',
-        marginTop: theme.spacing.unit * 3,
+        height:'calc(100vh - 290px)',
+        marginTop: theme.spacing.unit *3,
         overflowY: "auto",
     },
     tableHead: {
@@ -176,13 +213,29 @@ const styles = theme => ({
     },
     paperContainer: {
         display: 'flex',
-        padding: '20px',
-        boxShadow: 'rgba(149, 157, 165, 0.2) 0px 8px 24px',
-        marginBottom:'16px',
+        padding: '15px',
+        backgroundColor:'white',
+        margin:'16px 15px',
+        // marginBottom:'16px',
     },
     paperContainer2: {
-        padding: '20px',
-        boxShadow: 'rgba(149, 157, 165, 0.2) 0px 8px 24px',
+        backgroundColor:'white',
+        margin:'16px 15px',
+        padding: '15px',
+    },
+    Title: {
+        fontSize:'22px',
+        fontWeight:'500',
+        color:'#000000',
+    },
+    paperTitle: {
+        height:'64px',
+        
+        display: 'flex',
+        padding: '0 15px',
+        backgroundColor:'white',
+        alignItems:'center',
+        justifyContent:'space-between',
     },
     searchContainer: {
         display: 'flex',
