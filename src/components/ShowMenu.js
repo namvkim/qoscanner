@@ -281,12 +281,12 @@ const  ShowMenu = (props) => {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
     const label = { inputProps: { 'aria-label': 'Switch demo' } };
   return (
-    <Box sx={{ width: '100%' }} >
-      <Paper sx={{ width: '100%', mb: 2 }} >
+    <Box sx={{ width: '100%' }} className={classes.listProduct} >
+      <Paper className={classes.listTable}  >
         <ShowMenuToolbar numSelected={selected.length} />
         <TableContainer  className={classes.scroll}  >
           <Table
-            sx={{ minWidth: 750 }}
+            sx={{ minWidth: 650 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
@@ -366,11 +366,19 @@ const styles = theme => ({
  
   scroll: {
     width: '100%',
-    height:'calc(100vh - 510px)',
+    height:'57vh',
     marginTop: theme.spacing.unit * 3,
     overflowY: 'scroll',
- 
   },
+  listProduct: { 
+    backgroundColor: '#E5E5E5',
+    height: 'calc(100vh - 295px)',
+    padding: '15px 15px 15px 15px',
+    
+  },
+
+ 
+
 });
 ShowMenu.propTypes = {
   classes: PropTypes.object.isRequired

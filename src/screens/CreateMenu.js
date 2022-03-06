@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import LoadingComponent from "../components/LoadingComponent";
 import FormAddMenu from "../components/FormAddMenu";
@@ -6,19 +7,27 @@ import { withStyles } from "@material-ui/core/styles";
 import PropTypes from 'prop-types';
 
 const CreateMenu = (props) => {
+    
     const [loading, setLoading] = useState(true);
+    const [ProductID, setProductID] = useState("");
+    const { classes } = props;
+    
+    const getProductIDHandler = (id) => {
+        console.log("The ID of document to be edited: ", id);
+        setProductID(id);
+      };
 
     useEffect(() => {
         setLoading(false);
     }, []);
 
-    const { classes } = props;
+    
 
     return (
         loading ? <LoadingComponent /> :
             <div className={classes.Container}>
-                <FormAddMenu />
-                <ShowMenu />
+                <FormAddMenu id={ProductID} setProductID={setProductID} />
+                <ShowMenu  getProductID={getProductIDHandler}/>
             </div>
     )
 }
