@@ -366,14 +366,14 @@ const styles = theme => ({
  
   scroll: {
     width: '100%',
-    height:'57vh',
+    height:'59vh',
     marginTop: theme.spacing.unit * 3,
     overflowY: 'scroll',
   },
   listProduct: { 
     backgroundColor: '#E5E5E5',
     height: 'calc(100vh - 295px)',
-    padding: '15px 15px 15px 15px',
+    padding: '0px 15px 15px 15px',
     
   },
 
