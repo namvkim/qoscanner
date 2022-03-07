@@ -9,12 +9,12 @@ import PropTypes from 'prop-types';
 const CreateMenu = (props) => {
     
     const [loading, setLoading] = useState(true);
-    const [ProductID, setProductID] = useState("");
+    const [MenuID, setMenuID] = useState("");
     const { classes } = props;
     
-    const getProductIDHandler = (id) => {
+    const getMenuIDHandler = (id) => {
         console.log("The ID of document to be edited: ", id);
-        setProductID(id);
+        setMenuID(id);
       };
 
     useEffect(() => {
@@ -26,8 +26,8 @@ const CreateMenu = (props) => {
     return (
         loading ? <LoadingComponent /> :
             <div className={classes.Container}>
-                <FormAddMenu id={ProductID} setProductID={setProductID} />
-                <ShowMenu  getProductID={getProductIDHandler}/>
+                <FormAddMenu id={MenuID} setMenuID={setMenuID} />
+                <ShowMenu  getMenuID={getMenuIDHandler}/>
             </div>
     )
 }

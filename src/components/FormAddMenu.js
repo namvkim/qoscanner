@@ -8,16 +8,15 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { Alert, autocompleteClasses } from "@mui/material";
 import {storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import ProductDataService from "../services/product.service";
+import MenuDataService from "../services/menu.service";
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import Select from '@mui/material/Select';
 import * as Yup from "yup";
 
-const FormAddMenu = ({ id, setProductId }) => {
+const FormAddMenu = ({ id, setMenuId }) => {
     const navigate = useNavigate();
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
@@ -45,10 +44,15 @@ const FormAddMenu = ({ id, setProductId }) => {
         },
        
       ];
-    const handleChange = (e) => {
-        setCategory(e.target.value);
+      const handleChange = e => {
+        if(e.target.files[0]) { 
+          setImage(e.target.files[0]);
+        }
+      }
+    // const handleChange = (e) => {
+    //     setCategory(e.target.value);
       
-    };
+    // };
     const formik = useFormik({
         initialValues: {
             image: '',
@@ -69,8 +73,9 @@ const FormAddMenu = ({ id, setProductId }) => {
            
             .required("Nhập mô tả sản phẩm"),
       }),
-        onSubmit: values => {
-            console.log(values);
+
+      onSubmit: values => {
+        console.log(values);
                    // Create the file metadata
       /** @type {any} */
       const metadata = {
@@ -78,7 +83,7 @@ const FormAddMenu = ({ id, setProductId }) => {
       };
 
       // Upload file and metadata to the object 'images/mountains.jpg'
-      const storageRef = ref(storage, 'images/' + image.name);
+      const storageRef = ref(storage, 'pictures/' + values.image);
       const uploadTask = uploadBytesResumable(storageRef, image, metadata);
 
       // Listen for state changes, errors, and completion of the upload.
@@ -115,21 +120,22 @@ const FormAddMenu = ({ id, setProductId }) => {
           // Upload completed successfully, now we can get the download URL
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             console.log('File available at', downloadURL);
-            const newProduct = {
-              name:name,
-              price:price,
-              category:category,
+            const newMenu = {
+              name:values.name,
+              price:values.price,
+              category:values.category,
+              description: values.description,
               image: downloadURL,
             };
-            console.log(newProduct);
+            console.log(newMenu);
             try {
               if (id !== undefined && id !== "") {
-                ProductDataService.updateProduct(id, newProduct);
-                setProductId("");
+                MenuDataService.updateMenu(id, newMenu);
+                setMenuId("");
                 setMessage({ error: false, msg: "Updated successfully!" });
               } else {
-                ProductDataService.addProducts(newProduct);
-                setMessage({ error: false, msg: "New Product added successfully!" });
+                MenuDataService.addMenus(newMenu);
+                setMessage({ error: false, msg: "New Menu added successfully!" });
               }
             } catch (err) {
               setMessage({ error: true, msg: err.message });
@@ -156,7 +162,7 @@ const FormAddMenu = ({ id, setProductId }) => {
     const editHandler = async () => {
       setMessage("");
       try {
-        const docSnap = await ProductDataService.getProduct(id);
+        const docSnap = await MenuDataService.getMenu(id);
         console.log("The record is :", docSnap.data());
         setName(docSnap.data().name);
         setPrice(docSnap.data().price);
@@ -192,6 +198,15 @@ const FormAddMenu = ({ id, setProductId }) => {
             </div>
           
             <div style={styles.AddForm}>
+              {message?.msg && (
+            <Alert
+              variant={message?.error ? "danger" : "success"}
+              dismissible
+              onClose={() => setMessage("")}
+            >
+            {message?.msg}
+            </Alert>
+          )}
               <form onSubmit={formik.handleSubmit} style={styles.AddFormMenu}>
                   <div style={styles.AddFormHeading}>
                     <TextField 
@@ -265,8 +280,8 @@ const FormAddMenu = ({ id, setProductId }) => {
                       style={styles.AddFormImage}
                       id="image"
                         name="image"
-                        onChange={formik.handleChange}
-                        value={formik.values.image}
+                        onChange={handleChange}
+                        value={formik.values.image.name}
                         error={formik.errors.image && formik.touched.image}
                         helperText={  formik.touched.image && formik.errors.image}
                        
