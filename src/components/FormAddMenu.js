@@ -56,6 +56,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
             price: '',
             category: '',
             description: '',
+            status: true,
         },
 
         validationSchema: Yup.object({
@@ -117,6 +118,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             console.log('File available at', downloadURL);
             const newMenu = {
+              status: true,
               name:values.name,
               price:values.price,
               category:values.category,
@@ -336,13 +338,13 @@ const styles = {
     },
     
     AddFormHeading: {
-      padding: ' 10px 50px ', 
+      padding: ' 10px 200px ', 
       display: 'flex',
       justifyContent: 'center',
       
     },
     AddFormDescrip: {
-      padding: '10px 50px', 
+      padding: '10px 200px', 
       display: 'flex',
       justifyContent: 'center',
     },
@@ -372,10 +374,10 @@ const styles = {
     Button: {
         display: 'flex',
         justifyContent: 'right',
-        padding: '10px 0px',
+        padding: '10px 160px 10px 0px',
     },
     AddButton: {      
-        backgroundColor: '#307DD2',
+        backgroundColor: '#28a745',
         color: '#FFFFFF',
         width: '120px',
         height: '42px',

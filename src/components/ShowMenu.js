@@ -351,18 +351,22 @@ const  ShowMenu = ({ getMenuId}) => {
                       </TableCell>
                       <TableCell align="right" >
                           <Button 
-                               variant="secondary"
-                            onClick={(e) => getMenuId(row.id)}
+                              variant="contained"
+                               
+                              onClick={(e) => getMenuId(row.id)}
                             
-                            ><ModeEditOutlinedIcon/>
+                            >
+                              <ModeEditOutlinedIcon/> 
                             </Button>
                       </TableCell>
                       <TableCell align="right">
                           <Button 
-                           variant="danger"
-                            onClick={(e) => deleteHandler(row.id)}
-                            > 
-                            <DeleteOutlinedIcon/> 
+                              variant="contained"
+                              color="error"
+                              onClick={(e) => deleteHandler(row.id)}
+                            >
+                            <DeleteOutlinedIcon color="red"/> 
+                            
                           </Button>
                                             
                       </TableCell>
