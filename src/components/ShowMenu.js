@@ -1,5 +1,5 @@
 import * as React from 'react';
-import  { useState } from "react";
+import  { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -26,32 +26,11 @@ import { InputBase } from '@mui/material';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { withStyles } from "@material-ui/core/styles";
+import MenuDataService from "../services/menu.service";
+import {collection, onSnapshot} from 'firebase/firestore';
+import {db} from '../firebase';
+import Button from '@mui/material/Button';
 
-
-function createData(name, categories, price,  image) {
-  return {
-    name,
-    categories,
-    price,
-    image
-  };
-}
-
-const rows = [
-  createData('Cupcake', 305, 40.3000, 'https://sunhouse.com.vn/pic/news/1140_1.jpg'),
-  createData('Donut', 452, 400.90000, 'https://sunhouse.com.vn/pic/news/1140_1.jpg'),
-  createData('Eclair', 262, 600.5600000, 'https://sunhouse.com.vn/pic/news/1140_1.jpg'),
-  createData('Frozen yoghurt', 159, 454.066600, 'https://thucphamsi.vn/wp-content/uploads/2020/12/Luon-ngong-ap-chao-an-voi-xoi-chien-1.jpg'),
-  createData('Gingerbread', 356, 300.9, 'https://thucphamsi.vn/wp-content/uploads/2020/12/Luon-ngong-ap-chao-an-voi-xoi-chien-1.jpg'),
-  createData('Honeycomb', 408, 6.5, 'https://dulichvietnam.com.vn/vnt_upload/news/10_2019/mon-an-ngon-1.jpg'),
-  createData('Ice cream sandwich', 237,  400.000, 'https://dulichvietnam.com.vn/vnt_upload/news/10_2019/mon-an-ngon-1.jpg'),
-  createData('Jelly Bean', 375, 500.000, 'https://kinhtehaiphong.com/wp-content/uploads/2021/04/1617566133_maxresdefault.jpg'),
-  createData('KitKat', 518, 70.000, 'https://kinhtehaiphong.com/wp-content/uploads/2021/04/1617566133_maxresdefault.jpg'),
-  createData('Lollipop', 392, 0.0, 'https://kinhtehaiphong.com/wp-content/uploads/2021/04/1617566133_maxresdefault.jpg'),
-  createData('Marshmallow', 318, 20.000, 'https://cdn.huongnghiepaau.com/wp-content/uploads/2017/08/07a60d255a852413ae4590c15b587eaa.jpg'),
-  createData('Nougat', 360,  37.000, 'https://cdn.huongnghiepaau.com/wp-content/uploads/2017/08/07a60d255a852413ae4590c15b587eaa.jpg'),
-  createData('Oreo', 437,  400.000, 'https://cdn.huongnghiepaau.com/wp-content/uploads/2017/08/07a60d255a852413ae4590c15b587eaa.jpg'),
-];
 
 const headCells = [
   {
@@ -189,7 +168,7 @@ const ShowMenuToolbar = (props) => {
           component="div"
         >
           <div  style={{display: 'flex', alignItems: 'center',  }} >
-                <Paper  className={numSelected.searchContainer}  
+                <Paper  style={numSelected.searchContainer}  
                     sx={{ maxWidth:'60%', display: 'flex', alignItems: 'center', height: '40px',  boxShadow:'none' , border:'0.1px solid #CACFD2' }} >
                     <InputBase  sx={{ ml: 1, flex: 1 ,  minWidth: '60%' }} placeholder="Tìm theo tên sản phẩm" 
                            
@@ -229,14 +208,41 @@ ShowMenuToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-const  ShowMenu = (props) => {
-  const { classes } = props;
+const  ShowMenu = ({ getMenuId}) => {
+  
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('categories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+
+  const [menus, setMenus] = useState([]);
+
+
+  const menuCollectionRef = collection(db, "restaurant", "JfxhZ1Tdn8q0JLZm1JvL", "menu");
+  const getMenus = async () => {
+    onSnapshot(menuCollectionRef, snapshot => {
+      setMenus(snapshot.docs.map(doc => {
+     
+          return {
+              id: doc.id,
+              ...doc.data()
+              
+          }
+      }))
+  })   
+  };
+
+  const deleteHandler = async (id) => {
+    await MenuDataService.deleteMenu(id);
+    getMenus();
+  };
+
+  
+  useEffect(() => {
+    getMenus();
+  }, []);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -246,7 +252,7 @@ const  ShowMenu = (props) => {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n.name);
+      const newSelecteds = menus.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -277,14 +283,15 @@ const  ShowMenu = (props) => {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  
     const label = { inputProps: { 'aria-label': 'Switch demo' } };
   return (
-    <Box sx={{ width: '100%' }} className={classes.listProduct} >
-      <Paper className={classes.listTable}  >
+    <>
+    
+    <Box sx={{ width: '100%' }} style={styles.listProduct} >
+      <Paper style={styles.listTable}  >
         <ShowMenuToolbar numSelected={selected.length} />
-        <TableContainer  className={classes.scroll}  >
+        <TableContainer  style={styles.scroll}  >
           <Table
             sx={{ minWidth: 650 }}
             aria-labelledby="tableTitle"
@@ -296,13 +303,13 @@ const  ShowMenu = (props) => {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={menus.length}
             />
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
              
-                {rows.map((row, index) => {
+                {menus.map((row, index) => {
                   const isItemSelected = isSelected(row.name);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -312,7 +319,7 @@ const  ShowMenu = (props) => {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
+                      key={row.id}
                     >
                       <TableCell padding="checkbox" >
                         <Checkbox
@@ -333,20 +340,31 @@ const  ShowMenu = (props) => {
                       >
                         {row.name}
                       </TableCell>
-                      <TableCell component="th"id={labelId} >
+                      <TableCell component="th" id={labelId} >
                              <img  align="right" src={row.image} alt=""  height='50' width='60' style={{ borderRadius: "3px" }} />
                       </TableCell>
-                      <TableCell align="right">{row.categories}</TableCell>
+                      <TableCell align="right">{row.category}</TableCell>
                       <TableCell align="right">{row.price}</TableCell>
                      
                       <TableCell align="right">
                         <Switch {...label}  />
                       </TableCell>
                       <TableCell align="right" >
-                      <ModeEditOutlinedIcon  />
+                          <Button 
+                               variant="secondary"
+                            onClick={(e) => getMenuId(row.id)}
+                            
+                            ><ModeEditOutlinedIcon/>
+                            </Button>
                       </TableCell>
                       <TableCell align="right">
-                        <DeleteOutlinedIcon  />                      
+                          <Button 
+                           variant="danger"
+                            onClick={(e) => deleteHandler(row.id)}
+                            > 
+                            <DeleteOutlinedIcon/> 
+                          </Button>
+                                            
                       </TableCell>
 
                     </TableRow>
@@ -360,14 +378,14 @@ const  ShowMenu = (props) => {
       </Paper>
       
     </Box>
+    </>
   );
 }
-const styles = theme => ({
+const styles = {
  
   scroll: {
     width: '100%',
-    height:'59vh',
-    marginTop: theme.spacing.unit * 3,
+    height:'61vh',
     overflowY: 'scroll',
   },
   listProduct: { 
@@ -379,9 +397,6 @@ const styles = theme => ({
 
  
 
-});
-ShowMenu.propTypes = {
-  classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(ShowMenu);
+export default ShowMenu;

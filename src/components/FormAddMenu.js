@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import { Alert, autocompleteClasses } from "@mui/material";
+import { Alert } from "@mui/material";
 import {storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import MenuDataService from "../services/menu.service";
@@ -18,28 +18,23 @@ import * as Yup from "yup";
 
 const FormAddMenu = ({ id, setMenuId }) => {
     const navigate = useNavigate();
-    const [name, setName] = useState("");
-    const [price, setPrice] = useState("");
-    const [image, setImage] = useState("");
-    const [category, setCategory] = useState("");
-    const [description, setDescription] = useState("");
-    const [imgURL, setImgURL] = useState(null);
-    const [flag, setFlag] = useState(true);
-    const [message, setMessage] = useState({ error: false, msg: "" });
+    const [image, setImage] = useState(null);
+      
+      const [message, setMessage] = useState({ error: false, msg: "" });
 
     
 
     const categories = [
         {
-          value: 'USD',
+          value: 'Món khai vị',
           label: 'Món khai vị',
         },
         {
-          value: 'EUR',
+          value: 'Món tráng miệng',
           label: 'Món tráng miệng',
         },
         {
-          value: 'BTC',
+          value: 'Món dùng',
           label: 'Món dùng',
         },
        
@@ -55,6 +50,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
     // };
     const formik = useFormik({
         initialValues: {
+            id:'',
             image: '',
             name: '',
             price: '',
@@ -83,7 +79,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
       };
 
       // Upload file and metadata to the object 'images/mountains.jpg'
-      const storageRef = ref(storage, 'pictures/' + values.image);
+      const storageRef = ref(storage, 'images/' + image.name);
       const uploadTask = uploadBytesResumable(storageRef, image, metadata);
 
       // Listen for state changes, errors, and completion of the upload.
@@ -144,43 +140,35 @@ const FormAddMenu = ({ id, setMenuId }) => {
           });
         }
       );
-        setName("");
-        setPrice("");
-        setCategory("");
-        setDescription("");
-        setImgURL("");
-            signInWithEmailAndPassword(auth, values.image, values.name, values.price, values.category, values.description)
-                .then((userCredential) => {
-                    navigate('/');
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                });
+        
+         
         }
     });
+    
     const editHandler = async () => {
       setMessage("");
       try {
         const docSnap = await MenuDataService.getMenu(id);
         console.log("The record is :", docSnap.data());
-        setName(docSnap.data().name);
-        setPrice(docSnap.data().price);
-        setCategory(docSnap.data().category);
-        setDescription(docSnap.data().description);
-        setImage(docSnap.data().imgURL);  
+        console.log(docSnap.data().image);
+        formik.values.id = docSnap.data().id;
+        formik.values.name = docSnap.data().name;
+        formik.values.price = docSnap.data().price;
+        formik.values.category = docSnap.data().category;
+        formik.values.description = docSnap.data().description;
+        formik.values.image.name = docSnap.data().image;
+        
       } catch (err) {
         setMessage({ error: true, msg: err.message });
       }
     };
   
     useEffect(() => {
-      console.log("The id here is : ", id);
+      console.log("The id here is : ",id);
       if (id !== undefined && id !== "") {
         editHandler();
       }
     }, [id]);
-    
     return (
         <>
             <div style={styles.headerAddMenu}>
@@ -222,6 +210,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
                       helperText={  formik.touched.name && formik.errors.name}
                      
                     />
+                 
                     <TextField  
                       label="Giá sản phẩm"
                       variant="outlined" 
