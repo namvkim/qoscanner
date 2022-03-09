@@ -56,6 +56,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
             price: '',
             category: '',
             description: '',
+            status: true,
         },
 
         validationSchema: Yup.object({
@@ -117,6 +118,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             console.log('File available at', downloadURL);
             const newMenu = {
+              status: true,
               name:values.name,
               price:values.price,
               category:values.category,
@@ -336,42 +338,46 @@ const styles = {
     },
     
     AddFormHeading: {
-      padding: ' 10px 65px', 
+      padding: ' 10px 200px ', 
+      display: 'flex',
+      justifyContent: 'center',
       
     },
     AddFormDescrip: {
-      padding: '10px 65px', 
+      padding: '10px 200px', 
+      display: 'flex',
+      justifyContent: 'center',
     },
     AddFormName: {
-      width: '30%',
+      width: '40%',
       marginRight: '20px',
      
     },
     AddFormPrice: {
-      width: '15%',
+      width: '25%',
       marginRight: '20px',
      
     },
     AddFormCategory: {
-      width: '21%',
-      marginRight: '20px',
+      width: '35%',
+      
     },
     AddFormDes: {
-      width: '46.2%',
+      width: '64.5%',
       marginRight: '20px',
       fontSize: '16px',
       fontWeight: '400',
     },
     AddFormImage: {
-      width: '21%',
+      width: '34.2%',
     },
     Button: {
         display: 'flex',
-        justifyContent: 'center',
-        padding: '10px 10px',
+        justifyContent: 'right',
+        padding: '10px 160px 10px 0px',
     },
     AddButton: {      
-        backgroundColor: '#307DD2',
+        backgroundColor: '#28a745',
         color: '#FFFFFF',
         width: '120px',
         height: '42px',
