@@ -8,21 +8,22 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import { Alert } from "@mui/material";
+
 import {storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import MenuDataService from "../services/menu.service";
-import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
 import Select from '@mui/material/Select';
 import * as Yup from "yup";
+import DialogComponent from "./DialogComponent";
 
 const FormAddMenu = ({ id, setMenuId }) => {
     const navigate = useNavigate();
     const [image, setImage] = useState(null);
-      
-      const [message, setMessage] = useState({ error: false, msg: "" });
-
+    const [dialog, setDialog] = useState(false);  
     
+    const [message, setMessage] = useState();
 
     const categories = [
         {
@@ -130,13 +131,26 @@ const FormAddMenu = ({ id, setMenuId }) => {
               if (id !== undefined && id !== "") {
                 MenuDataService.updateMenu(id, newMenu);
                 setMenuId("");
-                setMessage({ error: false, msg: "Updated successfully!" });
+                setMessage({ 
+                  type: "success",
+                  path: "/CreateMenu",
+                  message: "Updated successfully!" 
+                });
+                setDialog(true);
               } else {
                 MenuDataService.addMenus(newMenu);
-                setMessage({ error: false, msg: "New Menu added successfully!" });
+                setMessage({ 
+                  type: "success",
+                  path: "/CreateMenu",
+                  message: "New Menu added successfully!" 
+                });
+                setDialog(true);
               }
             } catch (err) {
-              setMessage({ error: true, msg: err.message });
+              setMessage({ 
+                type: "error",
+                message: err.message });
+              setDialog(true);
             }
             
           });
@@ -161,7 +175,9 @@ const FormAddMenu = ({ id, setMenuId }) => {
         formik.values.image.name = docSnap.data().image;
         
       } catch (err) {
-        setMessage({ error: true, msg: err.message });
+        setMessage({ 
+          type: "error", 
+          message: err.message });
       }
     };
   
@@ -174,30 +190,14 @@ const FormAddMenu = ({ id, setMenuId }) => {
     return (
         <>
             <div style={styles.headerAddMenu}>
-                <div id="title-add-menu"  style={styles.headerAddTitle}>
-                    Tạo menu
-                </div>
-                
-                <div style={styles.headerInfo}>
-                    <div>John Smith</div>
-                    <ArrowDropDownSharpIcon/>
-                  
-                    &ensp;
-                    <img style={styles.accountLogo} alt='account-logo' src='./images/account.jpg' />
-                </div>
+                  <div style={styles.headerTitle}>Tạo món</div>
+                     <Stack direction="row" spacing={2} alignItems="center">
+                        <div>John Smith</div>   
+                        <Avatar alt="avatar restaurant" src="./images/account.jpg" />
+                    </Stack>
+               
             </div>
-          
-            <div style={styles.AddForm}>
-              {message?.msg && (
-            <Alert
-              variant={message?.error ? "danger" : "success"}
-              dismissible
-              onClose={() => setMessage("")}
-            >
-            {message?.msg}
-            </Alert>
-          )}
-              <form onSubmit={formik.handleSubmit} style={styles.AddFormMenu}>
+            <form onSubmit={formik.handleSubmit} style={styles.AddFormMenu}>
                   <div style={styles.AddFormHeading}>
                     <TextField 
                       label="Nhập tên sản phẩm" 
@@ -284,8 +284,8 @@ const FormAddMenu = ({ id, setMenuId }) => {
                         &ensp;&ensp;
                         <Button style={styles.AddButton} type="submit"> Thêm </Button>
                     </div>
-                </form>
-            </div>
+            </form>
+            <DialogComponent isOpen={dialog} setDialog={setDialog} authData={message} />
            
         </>
 
@@ -294,41 +294,24 @@ const FormAddMenu = ({ id, setMenuId }) => {
 
 const styles = {
     headerAddMenu: {
-        display: 'flex',
-        alignItems: 'center',
-        padding: '12px 0',
-        backgroundColor: '#fff',   
+      height:'64px',
+      display: 'flex',
+      padding: '0 15px',
+      backgroundColor:'#FFFFFF',
+      alignItems:'center',
+      justifyContent:'space-between',
     },
- 
-    headerAddTitle: {
-        fontSize: '22px',
-        fontWeight: '500',
-        lineHeight: '22px',
-        padding: '0 0 0 15px',
+    headerTitle: {
+        fontSize:'21px',
+        fontWeight:'500',
+        color:'#000000',
+        lineHeight: '22px'
     },
-    headerInfo: {
-        display: 'flex',
-        alignItems: 'center',
-        marginLeft: 'auto',
-        marginRight: '40px'
-    },
-    headerIcon: {
-        marginLeft: '10px',
-    },
-    accountLogo: {
-        height: '41px',
-        borderRadius: '41px',
-    },
-    AddForm: {
-        backgroundColor: '#E5E5E5',
-        border: '1px solid rgba(0,0 ,0 , 0.01)'
-
-    },
-    AddFormMenu: {
-      backgroundColor: 'white',
-      margin: '15px',
-      
-    
+  
+    AddFormMenu: { 
+      padding: '15px',
+      backgroundColor:'#FFFFFF',
+      margin:'16px 15px',
     },
     AddHeading: {
         backgroundColor: '#f6f8f8',
@@ -341,6 +324,7 @@ const styles = {
       padding: ' 10px 200px ', 
       display: 'flex',
       justifyContent: 'center',
+      width: '100%',
       
     },
     AddFormDescrip: {

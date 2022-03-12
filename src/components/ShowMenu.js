@@ -288,8 +288,8 @@ const  ShowMenu = ({ getMenuId}) => {
   return (
     <>
     
-    <Box sx={{ width: '100%' }} style={styles.listProduct} >
-      <Paper style={styles.listTable}  >
+    <div  style={styles.listProduct} >
+      <Paper >
         <ShowMenuToolbar numSelected={selected.length} />
         <TableContainer  style={styles.scroll}  >
           <Table
@@ -347,7 +347,7 @@ const  ShowMenu = ({ getMenuId}) => {
                       <TableCell align="right">{row.price}</TableCell>
                      
                       <TableCell align="right">
-                        <Switch {...label}  />
+                        <Switch>{row.status} </Switch> 
                       </TableCell>
                       <TableCell align="right" >
                           <Button 
@@ -381,7 +381,7 @@ const  ShowMenu = ({ getMenuId}) => {
     
       </Paper>
       
-    </Box>
+    </div>
     </>
   );
 }
@@ -389,13 +389,14 @@ const styles = {
  
   scroll: {
     width: '100%',
-    height:'61vh',
+    height: 'calc(100vh - 435px)',
     overflowY: 'scroll',
   },
   listProduct: { 
-    backgroundColor: '#E5E5E5',
-    height: 'calc(100vh - 295px)',
-    padding: '0px 15px 15px 15px',
+    padding: '15px',
+    backgroundColor:'#FFFFFF',
+    margin:'15px 15px',
+    
     
   },
 

@@ -275,6 +275,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import QRCode from "qrcode.react";
 
+
 const CreateQRCode = (props) => {
     const { classes } = props;
     const [loading, setLoading] = useState(true);
@@ -364,8 +365,8 @@ const CreateQRCode = (props) => {
                 <div className={classes.paperTitle} >
                      <div className={classes.Title}  >Tạo mã QR</div>
                      <Stack direction="row" spacing={2} alignItems="center">
-                        <div>John</div>     
-                        <Avatar alt="avatar restaurant" src="https://pdp.edu.vn/wp-content/uploads/2021/05/hinh-anh-dai-dien-avt-anime-1.jpg" />
+                        <div>John Smith</div>   
+                        <Avatar alt="avatar restaurant" src="./images/account.jpg" />
                     </Stack>
                 </div>
                 <form className={classes.paperContainer} onSubmit={formik.handleSubmit}>
@@ -501,7 +502,7 @@ const styles = theme => ({
         padding: '15px',
     },
     Title: {
-        fontSize:'22px',
+        fontSize:'21px',
         fontWeight:'500',
         color:'#000000',
     },
