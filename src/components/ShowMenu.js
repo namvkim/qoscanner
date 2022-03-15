@@ -27,7 +27,7 @@ import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { withStyles } from "@material-ui/core/styles";
 import MenuDataService from "../services/menu.service";
-import {collection, onSnapshot} from 'firebase/firestore';
+import {collection,doc,  onSnapshot} from 'firebase/firestore';
 import {db} from '../firebase';
 import Button from '@mui/material/Button';
 
@@ -220,15 +220,13 @@ const  ShowMenu = ({ getMenuId}) => {
   const [menus, setMenus] = useState([]);
 
 
-  const menuCollectionRef = collection(db, "restaurant", "JfxhZ1Tdn8q0JLZm1JvL", "menu");
+  const menuCollectionRef = doc(db, "restaurant", "jicVmZc9Iu83NiLVHmFy");
   const getMenus = async () => {
-    onSnapshot(menuCollectionRef, snapshot => {
+    onSnapshot(collection(menuCollectionRef, 'menu'), snapshot => {
       setMenus(snapshot.docs.map(doc => {
-     
           return {
               id: doc.id,
-              ...doc.data()
-              
+              ...doc.data() 
           }
       }))
   })   

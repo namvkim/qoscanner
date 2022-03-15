@@ -18,6 +18,7 @@ import Select from '@mui/material/Select';
 import * as Yup from "yup";
 import DialogComponent from "./DialogComponent";
 
+
 const FormAddMenu = ({ id, setMenuId }) => {
     const navigate = useNavigate();
     const [image, setImage] = useState(null);
@@ -127,6 +128,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
               image: downloadURL,
             };
             console.log(newMenu);
+            
             try {
               if (id !== undefined && id !== "") {
                 MenuDataService.updateMenu(id, newMenu);
@@ -150,6 +152,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
               setMessage({ 
                 type: "error",
                 message: err.message });
+                console.log(err);
               setDialog(true);
             }
             
