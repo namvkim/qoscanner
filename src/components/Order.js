@@ -161,7 +161,7 @@ const style = {
             marginTop: theme.spacing.unit *2,
             overflowY: "auto",
             backgroundColor: '#ffff',
-            margin:'0px 15px',
+            marginLeft:'15px',
             width:'100%',
         },
     })
