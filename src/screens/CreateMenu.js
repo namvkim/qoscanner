@@ -34,7 +34,8 @@ const CreateMenu = (props) => {
 
 const styles = theme => ({
     Container: {
-        height:'calc(100vh-48px)',
+        height:'100vh',
+        backgroundColor: '#E5E5E5',
     }
 });
 
