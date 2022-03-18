@@ -1,4 +1,5 @@
 
+import {  useState, useEffect } from "react";
 import { Button, InputBase } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
@@ -11,6 +12,11 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import DoneIcon from '@mui/icons-material/Done';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ChatDataService from "../services/chat.service";
+import { collection, onSnapshot } from "firebase/firestore";
+import LoadingComponent from "../components/LoadingComponent";
+import { db, auth } from "../firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -46,11 +52,44 @@ function a11yProps(index) {
 }
 
 const Chat =() =>{
+  const [loading, setLoading] = useState(true);
   const [value, setValue] = React.useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+  const [message, setMessage] = useState([]);
 
+  const idRestaurant = auth.currentUser.uid;
+  const messageCollectionRef = collection(
+    db,
+    "restaurant",
+    idRestaurant,
+    "message"
+  );
+
+
+  const getMessage = async () => {
+    onSnapshot(messageCollectionRef, (snapshot) => {
+        setMessage(
+        snapshot.docs.map((doc) => {
+          return {
+            id: doc.id,
+            ...doc.data(),
+          };
+        })
+      );
+    });
+  };
+  // const updateStatus =(id)=> {
+  //     db.collection("restaurant").doc(idRestaurant).collection("message").doc(id)
+  //     .set(db.collection("restaurant").doc(idRestaurant).collection("message").doc(id).status="false");
+  //   console.log(id);
+  //   }
+
+  useEffect(() => {
+    getMessage();
+    setLoading(false);
+  }, []);
   return (
     <div  style={style.container}>
         <div style={style.inline}>
@@ -74,110 +113,42 @@ const Chat =() =>{
         </Box>
         <TabPanel   value={value} index={0}>
            <div style={style.scroll}>
+            {message.map((row) => (
+            row.status==true ?(
                 <div style={style.chat}>
                     <div style={style.inline}>
-                        <div><b>Bàn số 1 </b> </div>
+                        <div><b>{row.table} </b></div>
                         <div>9:15</div>
                     </div>
                     <div style={style.mesdone}>
-                        <div>Thêm nước chấm </div>
-                        <Button size="small" style={style.iconColor}><DoneIcon /></Button>
+                        <div>{row.content}</div>
+                        <Button size="small"  
+                        // onClick={() => updateStatus(row.id)} 
+                         ><DoneIcon /></Button>
                     </div>
-                </div>
-                <div style={style.chat}>
-                    <div style={style.inline}>
-                        <div><b>Bàn số 1 </b> </div>
-                        <div>9:15</div>
-                    </div>
-                    <div style={style.mesdone}>
-                        <div>Thêm nước chấm</div>
-                        <Button size="small" style={style.iconColor}><DoneIcon /></Button>
-                    </div>
-                </div>
-                <div style={style.chat}>
-                    <div style={style.inline}>
-                        <div><b>Bàn số 1 </b> </div>
-                        <div>9:15</div>
-                    </div>
-                    <div style={style.mesdone}>
-                        <div>Thêm nước chấm</div>
-                        <Button size="small" style={style.iconColor}><DoneIcon /></Button>
-                    </div>
-                </div>
-                <div style={style.chat}>
-                    <div style={style.inline}>
-                        <div><b>Bàn số 1 </b> </div>
-                        <div>9:15</div>
-                    </div>
-                    <div style={style.mesdone}>
-                        <div>Thêm nước chấm</div>
-                        <Button size="small" style={style.iconColor}><DoneIcon /></Button>
-                    </div>
-                </div>
-                <div style={style.chat}>
-                    <div style={style.inline}>
-                        <div><b>Bàn số 1 </b> </div>
-                        <div>9:15</div>
-                    </div>
-                    <div style={style.mesdone}>
-                        <div>Thêm nước chấm</div>
-                        <Button size="small" style={style.iconColor}><DoneIcon /></Button>
-                    </div>
-                </div>
-                <div style={style.chat}>
-                    <div style={style.inline}>
-                        <div><b>Bàn số 1 </b> </div>
-                        <div>9:15</div>
-                    </div>
-                    <div style={style.mesdone}>
-                        <div>Thêm nước chấm</div>
-                        <Button size="small" style={style.iconColor}><DoneIcon /></Button>
-                    </div>
-                </div>
-                <div style={style.chat}>
-                    <div style={style.inline}>
-                        <div><b>Bàn số 1 </b> </div>
-                        <div>9:15</div>
-                    </div>
-                    <div style={style.mesdone}>
-                        <div>Thêm nước chấm</div>
-                        <Button size="small" style={style.iconColor}><DoneIcon /></Button>
-                    </div>
-                </div>
-                <div style={style.chat}>
-                    <div style={style.inline}>
-                        <div><b>Bàn số 1 </b> </div>
-                        <div>9:15</div>
-                    </div>
-                    <div style={style.mesdone}>
-                        <div>Thêm nước chấm</div>
-                        <Button size="small" style={style.iconColor}><DoneIcon /></Button>
-                    </div>
-                </div>
-                <div style={style.chat}>
-                    <div style={style.inline}>
-                        <div><b>Bàn số 1 </b> </div>
-                        <div>9:15</div>
-                    </div>
-                    <div style={style.mesdone}>
-                        <div>Thêm nước chấm</div>
-                        <Button size="small" style={style.iconColor}><DoneIcon /></Button>
-                    </div>
-                </div>
+                </div> 
+                )  :  ""
+                ))}
            </div>
         </TabPanel>
+      
+ 
         <TabPanel value={value} index={1}>
             <div style={style.scroll}>
+            {message.map((row) => (
+                row.status==false ?(
                 <div style={style.chat}>
                     <div style={style.inline}>
-                        <div><b>Bàn số 1 </b> </div>
+                        <div><b>{row.table} </b> </div>
                         <div>9:15</div>
                     </div>
                     <div style={style.mesdone}>
-                        <div>Thêm nước chấm</div>
-                        <Button size="small"><CheckCircleOutlineIcon /></Button>
+                        <div>{row.content}</div>
+                        <Button size="small"  
+                         ><CheckCircleOutlineIcon /></Button>
                     </div>
-                </div>
+                </div> 
+                 ):""))}
             </div>
         </TabPanel>
         </Box>
@@ -212,7 +183,7 @@ const style = {
         justifyContent:'space-between',
     },
     iconColor: {
-        color:'#000',
+        color:'#ECA64E',
     }
 }
 

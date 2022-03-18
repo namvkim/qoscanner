@@ -22,20 +22,20 @@ import * as Yup from "yup";
 import QRCode from "qrcode.react";
 import QrCodeDataService from "../services/qrcode.service";
 import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 import { Alert } from "@mui/material";
 
 const CreateQRCode = (props, { id, setQrId, getMenuId }) => {
   const { classes } = props;
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ error: false, msg: "" });
-  const idRestaurent = "JfxhZ1Tdn8q0JLZm1JvL";
   const [qrs, setQrs] = useState([]);
 
+  const idRestaurant = auth.currentUser.uid;
   const qrCodeCollectionRef = collection(
     db,
     "restaurant",
-    "JfxhZ1Tdn8q0JLZm1JvL",
+    idRestaurant,
     "qrCode"
   );
   const getQrs = async () => {
@@ -113,21 +113,22 @@ const CreateQRCode = (props, { id, setQrId, getMenuId }) => {
     setCurrency(event.target.value);
   };
 
-  const downloadQR = (id) => {
-    console.log("id: " + id);
+  const downloadQR = (id, name) => {
+    // console.log("id: " + id);
     const canvas = document.getElementById(id);
-    console.log("canvas: " + canvas);
+    // console.log("canvas: " + canvas);
     const pngUrl = canvas
       .toDataURL("image/png")
       .replace("image/png", "image/octet-stream");
-    console.log("pngUrl", pngUrl);
+    // console.log("pngUrl", pngUrl);
     let downloadLink = document.createElement("a");
-    console.log("downloadLink: " + downloadLink);
+    // console.log("downloadLink: " + downloadLink);
     downloadLink.href = pngUrl;
-    downloadLink.download = "qrcode.png";
+    downloadLink.download = "qrcode_"+name+".png";
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
+    console.log(name);
   };
 
   return loading ? (
@@ -218,7 +219,7 @@ const CreateQRCode = (props, { id, setQrId, getMenuId }) => {
             </TableHead>
             <TableBody>
               {qrs.map((row, index) => (
-                <TableRow
+                <TableRow key={index}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell align="left">
@@ -230,7 +231,7 @@ const CreateQRCode = (props, { id, setQrId, getMenuId }) => {
                     <Button
                       className={classes.iconCLolor}
                       type="button"
-                      onClick={() => downloadQR(row.id)}
+                      onClick={() => downloadQR(row.id, row.name)}
                     >
                       <FileDownloadOutlinedIcon />
                     </Button>
@@ -245,7 +246,7 @@ const CreateQRCode = (props, { id, setQrId, getMenuId }) => {
                     <div className={classes.qrcodeHide}>
                       <QRCode
                         id={row.id}
-                        value={idRestaurent + "/" + row.name}
+                        value={idRestaurant + "/" + row.name}
                         size={450}
                         level={"H"} //Mức độ sửa chữa lỗi của QR code
                         includeMargin={true}

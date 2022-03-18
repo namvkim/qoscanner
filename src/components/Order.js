@@ -4,39 +4,87 @@ import {Button } from "@mui/material";
 import ClearIcon from '@mui/icons-material/Clear';
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from 'prop-types';
-
+import { collection, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../firebase";
 const Orders = (props) => {
     const [loading, setLoading] = useState(true);
     const { classes } = props;
 
+    // const idRestaurant = auth.currentUser.uid;
+  const [order, setOrrder] = useState([]);
+//   const [total]= useState([]);
+//   const temp = 0;
+//   const total = 0;
+  const orderCollectionRef = collection(
+      db,
+      "restaurant",
+      "JfxhZ1Tdn8q0JLZm1JvL",
+      "order"
+    );
+    // {order.map((row ) => (
+        // console.log(row.table),
+        // console.log(row.status),
+        // console.log(row.data[0].price),
+        // console.log("độ dài:"+order.length)
+        //  {
+           
+           
+        //  }
+    // ))
     useEffect(() => {
+     
+        getOrder();
+       
         setLoading(false);
+
     }, []);
+
+    const getOrder = async () => {
+        onSnapshot(orderCollectionRef, (snapshot) => {
+            setOrrder(
+            snapshot.docs.map((doc) => {
+              return {
+                id: doc.id,
+                ...doc.data(),
+              };
+            })
+          );
+        });
+      };
+      
+  
+               
             return (
+                // const total= 0;
                 loading ? <LoadingComponent /> :
                 <div style={style.Container} > 
                     <div  style={style.inlines}>
                         <div  className={classes.scroll}>
+                        {order.map((row,index ) => (
+                            
+                            order.status=true?(
                             <div>
                                 <div style={style.order}>
-                                    <div>
-                                        <div style={style.tableName}>Bàn số 1</div>
+                                    <div> 
+                                        <div style={style.tableName}>{row.table}</div>
                                         <div style={style.tableContent}>
+                                            {row.data.map((item)=> (
                                             <div style={style.inline}>
-                                                    <div > 1<b> X </b>Xương ram</div>
-                                                    <div>50.000đ</div>
-                                                    <Button><ClearIcon/></Button>
+                                                <div>{item.quantity}<b> X </b>{item.name}</div>
+                                                <div>{item.price}</div>
+                                                {/* <div>{row.data[0].price}</div> */}
+                                             <Button><ClearIcon/></Button>
                                             </div>
-                                            <div style={style.inline}>
-                                                    <div > 1<b> X </b>Xương ram</div>
-                                                    <div>50.000đ</div>
-                                                    <Button><ClearIcon/></Button>
+                                            // <div></div>
+                                            ))}
+                                            <div style={style.total}>Tổng cộng:  
                                             </div>
-                                            <div style={style.total}>Tổng cộng: 100.000đ</div>
+                                            {row.note?(
                                             <div >
                                                 <div>Ghi chú:</div>
-                                                <div  style={style.noteDetail}>Thêm nước chấm cay cay</div>
+                                                <div  style={style.noteDetail}>{row.note}</div>
                                             </div>
+                                            ):""}
                                         </div>
                                     </div>
                                     <div>
@@ -46,7 +94,9 @@ const Orders = (props) => {
                                 </div>
                                 <hr height='100%'/>
                             </div>
-                            <div>
+                            ): ""
+                                ))}
+                            {/* <div>
                                 <div style={style.order}>
                                     <div>
                                         <div style={style.tableName}>Bàn số 2</div>
@@ -95,7 +145,7 @@ const Orders = (props) => {
                                     </div>
                                 </div>
                                 <hr height='100%'/>
-                            </div>
+                            </div> */}
                         </div>
                         
                     </div>

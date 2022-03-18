@@ -1,4 +1,4 @@
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
 import {
   collection,
   getDoc,
@@ -9,29 +9,34 @@ import {
   doc,
 } from "firebase/firestore";
 
-const qrCodeCollectionRef = collection(db, "restaurant", "JfxhZ1Tdn8q0JLZm1JvL", "qrCode");
+const qrCodeCollectionRef = collection(db, "restaurant"); 
 class QrCodeDataService {
   addQrCode = (newQrCode) => {
-    return addDoc(qrCodeCollectionRef, newQrCode);
+    const idRestaurant = auth.currentUser.uid;
+    return addDoc(collection(qrCodeCollectionRef, idRestaurant,'qrCode'), newQrCode);
   };
 
   updateQrCode = (id, updateQrCode) => {
-    const qrDoc = doc(db, "restaurant", "JfxhZ1Tdn8q0JLZm1JvL", "qrCode", id);
-    return updateDoc(qrDoc, updateQrCode);
+    const idRestaurant = auth.currentUser.uid;
+    return updateDoc(collection(qrCodeCollectionRef, idRestaurant,'qrCode'), updateQrCode, id);
   };
 
   deleteQrCode = (id) => {
-    const qrCodeDoc = doc(db, "restaurant", "JfxhZ1Tdn8q0JLZm1JvL","qrCode", id);
-    return deleteDoc(qrCodeDoc);
+    const idRestaurant = auth.currentUser.uid;
+    const qrDoc = doc(collection(qrCodeCollectionRef, idRestaurant, 'qrCode'), id);
+    return deleteDoc(qrDoc);
   };
 
-  // getAllMenus = () => {
-  //   return getDocs(menuCollectionRef);
-  // };
-  // getMenu= (id) => {
-  //   const menuDoc = doc(db, "restaurant", "JfxhZ1Tdn8q0JLZm1JvL", "menu", id);
-  //   return getDoc(menuDoc);
-  // };
+  getAllQrCodes = () => {
+    const idRestaurant = auth.currentUser.uid;
+    return getDocs(collection(qrCodeCollectionRef, idRestaurant,'qrCode'));
+  };
+
+  getQrCode= (id) => {
+    const idRestaurant = auth.currentUser.uid;
+    const qrDoc = doc(collection(qrCodeCollectionRef, idRestaurant, 'qrCode'), id);
+    return getDoc(qrDoc);
+  };
 }
 
 export default new QrCodeDataService();
