@@ -1,31 +1,39 @@
-import { React, useState, useEffect } from "react";
-import { TextField, Button, Checkbox } from "@mui/material";
-import LoadingComponent from "../components/LoadingComponent";
-import MenuItem from "@mui/material/MenuItem";
-import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
-import SearchIcon from "@mui/icons-material/Search";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-import { withStyles } from "@material-ui/core/styles";
-import PropTypes from "prop-types";
-import Avatar from "@mui/material/Avatar";
-import Stack from "@mui/material/Stack";
-import { useFormik } from "formik";
+import { 
+  React, 
+  useState, 
+  useEffect 
+} from "react";
+import {
+  MenuItem,
+  Paper,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Avatar,
+  Stack,
+  Alert,
+  TextField,
+  Button,
+  Checkbox
+} from "@mui/material";
 import * as Yup from "yup";
 import QRCode from "qrcode.react";
-import QrCodeDataService from "../services/qrcode.service";
-import { collection, onSnapshot } from "firebase/firestore";
+import PropTypes from "prop-types";
+import { useFormik } from "formik";
 import { db, auth } from "../firebase";
-import { Alert } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import {withStyles } from "@material-ui/core/styles";
+import QrCodeDataService from "../services/qrcode.service";
+import {collection, onSnapshot  } from "firebase/firestore";
+import LoadingComponent from "../components/LoadingComponent";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 
-const CreateQRCode = (props, { id, setQrId, getMenuId }) => {
+const CreateQRCode = (props) => {
   const { classes } = props;
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ error: false, msg: "" });
@@ -75,14 +83,8 @@ const CreateQRCode = (props, { id, setQrId, getMenuId }) => {
       };
       console.log("kt:" + newQrCode);
       try {
-        if (id !== undefined && id !== "") {
-          QrCodeDataService.updateQrCode(id, newQrCode);
-          setQrId("");
-          setMessage({ error: false, msg: "Sửa mã Qrcode thành công!" });
-        } else {
           QrCodeDataService.addQrCode(newQrCode);
           setMessage({ error: false, msg: "Thêm mã QrCode thành công!" });
-        }
       } catch (err) {
         setMessage({ error: true, msg: err.message });
       }
@@ -114,15 +116,11 @@ const CreateQRCode = (props, { id, setQrId, getMenuId }) => {
   };
 
   const downloadQR = (id, name) => {
-    // console.log("id: " + id);
     const canvas = document.getElementById(id);
-    // console.log("canvas: " + canvas);
     const pngUrl = canvas
       .toDataURL("image/png")
       .replace("image/png", "image/octet-stream");
-    // console.log("pngUrl", pngUrl);
     let downloadLink = document.createElement("a");
-    // console.log("downloadLink: " + downloadLink);
     downloadLink.href = pngUrl;
     downloadLink.download = "qrcode_"+name+".png";
     document.body.appendChild(downloadLink);
@@ -283,7 +281,7 @@ const styles = (theme) => ({
   scroll: {
     width: "100%",
     height: "calc(100vh - 290px)",
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
     overflowY: "auto",
   },
   tableHead: {

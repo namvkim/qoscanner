@@ -1,28 +1,28 @@
 
-import {  useState, useEffect } from "react";
-import { Button, InputBase } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
+import { 
+  Button, 
+  InputBase, 
+  Paper,
+  Tabs,
+  Tab,
+  Box,
+  IconButton
+} from '@mui/material';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import DoneIcon from '@mui/icons-material/Done';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import ChatDataService from "../services/chat.service";
-import { collection, onSnapshot } from "firebase/firestore";
-import LoadingComponent from "../components/LoadingComponent";
 import { db, auth } from "../firebase";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {  useState, useEffect } from "react";
+import DoneIcon from '@mui/icons-material/Done';
+import SearchIcon from '@mui/icons-material/Search';
+import ChatDataService from "../services/chat.service";
+import LoadingComponent from "../components/LoadingComponent";
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import {collection, onSnapshot } from "firebase/firestore";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
-
   return (
-    <div
+    <div 
       role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
@@ -31,7 +31,7 @@ function TabPanel(props) {
     >
       {value === index && (
         <Box sx={{ p: 1 }}>
-          <Typography>{children}</Typography>
+          <div key={index}>{children}</div>
         </Box>
       )}
     </div>
@@ -51,46 +51,57 @@ function a11yProps(index) {
   };
 }
 
-const Chat =() =>{
+const Chat =()=>{
   const [loading, setLoading] = useState(true);
   const [value, setValue] = React.useState(0);
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-  const [message, setMessage] = useState([]);
+  const [messag, setMessag] = useState([]);
+    
+  function addZero(i) {
+    if (i < 10) {i = "0" + i}
+    return i;
+  }
 
   const idRestaurant = auth.currentUser.uid;
   const messageCollectionRef = collection(
-    db,
+    db, 
     "restaurant",
     idRestaurant,
     "message"
-  );
-
+    );
 
   const getMessage = async () => {
     onSnapshot(messageCollectionRef, (snapshot) => {
-        setMessage(
-        snapshot.docs.map((doc) => {
+        let message = snapshot.docs.map((doc) => {
           return {
             id: doc.id,
             ...doc.data(),
           };
         })
+      // message.sort((start, end)=>)
+        setMessag(
+        message
       );
     });
   };
-  // const updateStatus =(id)=> {
-  //     db.collection("restaurant").doc(idRestaurant).collection("message").doc(id)
-  //     .set(db.collection("restaurant").doc(idRestaurant).collection("message").doc(id).status="false");
-  //   console.log(id);
-  //   }
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const updateStatus = (id) => {
+    ChatDataService.updateStatusChat(id, { status: false })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
 
   useEffect(() => {
     getMessage();
     setLoading(false);
   }, []);
+
   return (
+    loading ? <LoadingComponent /> :
     <div  style={style.container}>
         <div style={style.inline}>
             <Paper   
@@ -106,24 +117,30 @@ const Chat =() =>{
         <Box sx={{ width: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-            <Tab icon={<img width= "28" height="28" alt='icon image all' src='./images/iconAll.png' />} iconPosition="start" label="Tất cả" {...a11yProps(0)} ></Tab>
-            <Tab icon={<img width= "28" height="28" alt='icon image message' src='./images/iconmessag.png' />} iconPosition="start" label="Đã đọc" {...a11yProps(1)} />
+              <Tab icon={<img width= "28" height="28" alt='icon image all' src='./images/iconAll.png' />} iconPosition="start" label="Tất cả" {...a11yProps(0)} />
+              <Tab icon={<img width= "28" height="28" alt='icon image message' src='./images/iconmessag.png' />} iconPosition="start" label="Đã đọc" {...a11yProps(1)} />
             </Tabs>
-            
         </Box>
-        <TabPanel   value={value} index={0}>
+        <TabPanel value={value} index={0}>
            <div style={style.scroll}>
-            {message.map((row) => (
-            row.status==true ?(
-                <div style={style.chat}>
+            {messag.map((row, index) => (
+            row.status===true ?(
+                <div  style={style.chat}>
                     <div style={style.inline}>
                         <div><b>{row.table} </b></div>
-                        <div>9:15</div>
+                        <div>
+                          {/* 19:05 */}
+                            {addZero(row.createAt.toDate().getHours())}:
+                            {addZero(row.createAt.toDate().getMinutes())}{" "}
+                            {/* {addZero(row.createAt.toDate().getDate())}- */}
+                            {/* {addZero(row.createAt.toDate().getMonth() + 1)} */}
+                            {/* {addZero(row.createAt.toDate().getFullYear())} */}
+                      </div>
                     </div>
                     <div style={style.mesdone}>
                         <div>{row.content}</div>
                         <Button size="small"  
-                        // onClick={() => updateStatus(row.id)} 
+                         onClick={() => updateStatus(row.id)}
                          ><DoneIcon /></Button>
                     </div>
                 </div> 
@@ -131,13 +148,11 @@ const Chat =() =>{
                 ))}
            </div>
         </TabPanel>
-      
- 
         <TabPanel value={value} index={1}>
             <div style={style.scroll}>
-            {message.map((row) => (
-                row.status==false ?(
-                <div style={style.chat}>
+            {messag.map((row, index) => (
+                row.status===false ?(
+                <div key={index} style={style.chat}>
                     <div style={style.inline}>
                         <div><b>{row.table} </b> </div>
                         <div>9:15</div>
@@ -186,7 +201,5 @@ const style = {
         color:'#ECA64E',
     }
 }
-
-
 
 export default Chat;

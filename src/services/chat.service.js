@@ -9,39 +9,30 @@ import {
   doc,
 } from "firebase/firestore";
 
-const qrCodeCollectionRef = collection(db, "restaurant"); 
+const messageCollectionRef = collection(db, "restaurant"); 
 class ChatDataService {
-  addMessage = (newMessage) => {
+//update status of Chat
+  updateStatusChat = (id, update) => {
     const idRestaurant = auth.currentUser.uid;
-    return addDoc(collection(qrCodeCollectionRef, idRestaurant,'message'), newMessage);
+    const chatDoc = doc(collection(messageCollectionRef, idRestaurant,'message'),id);
+    return updateDoc(chatDoc, update);
   };
-
-  updateMessage = (id, updateMessage) => {
+//update status of Order
+  updateStatusOrder = (id, update) => {
     const idRestaurant = auth.currentUser.uid;
-    return updateDoc(collection(qrCodeCollectionRef, idRestaurant,'message'), updateMessage, id)
+    const orderDoc = doc(collection(messageCollectionRef, idRestaurant,'order'),id);
+    return updateDoc(orderDoc, update);
   };
+  
+  // addMessage = (newMessage) => {
+  //   const idRestaurant = auth.currentUser.uid;
+  //   return addDoc(collection(messageCollectionRef, idRestaurant,'message'), newMessage);
+  // };
 
-//   updateQrCode = (id, updateQrCode) => {
-//     const idRestaurant = auth.currentUser.uid;
-//     return updateDoc(collection(qrCodeCollectionRef, idRestaurant,'message'), updateQrCode, id);
-//   };
-
-//   deleteQrCode = (id) => {
-//     const idRestaurant = auth.currentUser.uid;
-//     const qrDoc = doc(collection(qrCodeCollectionRef, idRestaurant, 'message'), id);
-//     return deleteDoc(qrDoc);
-//   };
-
-//   getAllQrCodes = () => {
-//     const idRestaurant = auth.currentUser.uid;
-//     return getDocs(collection(qrCodeCollectionRef, idRestaurant,'message'));
-//   };
-
-//   getQrCode= (id) => {
-//     const idRestaurant = auth.currentUser.uid;
-//     const qrDoc = doc(collection(qrCodeCollectionRef, idRestaurant, 'message'), id);
-//     return getDoc(qrDoc);
-//   };
+  // getMessage= (id) => {
+  //   const idRestaurant = auth.currentUser.uid;
+  //   return getDocs(collection(messageCollectionRef, idRestaurant,'message', id));
+  // };
 }
 
 export default new ChatDataService();

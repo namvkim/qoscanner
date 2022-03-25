@@ -1,9 +1,13 @@
-import LoadingComponent from "../components/LoadingComponent";
-import {React, useState, useEffect } from "react";
-import Avatar from '@mui/material/Avatar';
-import Stack from '@mui/material/Stack';
+import {
+    React, 
+    useState, 
+    useEffect 
+} from "react";
 import Chat from "../components/Chat";
+import Stack from '@mui/material/Stack';
 import Order from "../components/Order";
+import Avatar from '@mui/material/Avatar';
+import LoadingComponent from "../components/LoadingComponent";
 
 const Orders = () => {
     const [loading, setLoading] = useState(true);
@@ -51,12 +55,10 @@ const style = {
     order: {
         width:'70%',
     },
-
     Container: {
         backgroundColor: '#E5E5E5',
         height:'100vh',
     },
-  
     Title: {
         fontSize:'22px',
         fontWeight:'500',
@@ -70,7 +72,6 @@ const style = {
         alignItems:'center',
         justifyContent:'space-between',
     },
-   
 } 
   
   export default Orders;
