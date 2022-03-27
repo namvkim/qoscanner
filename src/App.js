@@ -14,6 +14,7 @@ import Menu from './screens/Menu';
 import Orders from './screens/Orders';
 import CreateMenu from './screens/CreateMenu';
 import CreateQRCode from './screens/CreateQRCode';
+import Statistical from './screens/Statistical';
 import Customer from './screens/Customer';
 import Voucher from './screens/Voucher';
 import Setting from './screens/Setting';
@@ -41,6 +42,7 @@ const App = () => {
             <Route path="/" element={<Orders />} />
             <Route path="/CreateMenu" element={<CreateMenu />} />
             <Route path="/CreateQRCode" element={<CreateQRCode />} />
+            <Route path="/Statistical" element={<Statistical />} />
             <Route path="/Customer" element={<Customer />} />
             <Route path="/Voucher" element={<Voucher />} />
             <Route path="/Setting" element={<Setting />} />

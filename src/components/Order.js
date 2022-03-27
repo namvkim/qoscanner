@@ -12,7 +12,7 @@ const Orders = (props) => {
     const [loading, setLoading] = useState(true);
     const { classes } = props;
     const idRestaurant = auth.currentUser.uid;
-    const [order, setOrrder] = useState([]);
+    const [order, setOrder] = useState([]);
     const orderCollectionRef = collection(
       db,
       "restaurant",
@@ -27,14 +27,14 @@ const Orders = (props) => {
 
     const getOrder = async () => {
         onSnapshot(orderCollectionRef, (snapshot) => {
-            setOrrder(
-            snapshot.docs.map((doc) => {
+            let order = snapshot.docs.map((doc) => {
               return {
                 id: doc.id,
                 ...doc.data(),
               };
             })
-          );
+            order.sort((a, b)=>a.createAt - b.createAt);
+            setOrder( order );
         });
       };
 
@@ -46,27 +46,27 @@ const Orders = (props) => {
         getOrder();
         setLoading(false);
     }, []);
-    
+
         return (
             loading ? <LoadingComponent /> :
             <div style={style.Container} > 
                 <div  style={style.inlines}>
                     <div  className={classes.scroll}>
-                    {order.map((row ) => {
+                    {order.map((row, index ) => {
                         var total = 0;
                         return (
-                        row.status ===true ? (
-                        <div>
+                        row.status === true ? (
+                        <div key={index}>
                             <div style={style.order}>
                                 <div> 
                                     <div style={style.tableName}>{row.table}</div>
                                     <div style={style.tableContent}>
-                                        {row.data.map((item)=> {
+                                        {row.data.map((item, index)=> {
                                             total += item.quantity*item.price; 
                                             return (
-                                        <div style={style.inline}>
-                                            <div>{item.quantity}<b> X </b>{item.name}</div>
-                                            <div>{item.price}</div>
+                                        <div key={index} style={style.inline}>
+                                            <div  style={style.Tname}>{item.quantity}<b> X </b>{item.name}</div>
+                                            <div  style={style.Tprice}>{item.price}</div>
                                             <Button><ClearIcon/></Button>
                                         </div>
                                         
@@ -83,12 +83,10 @@ const Orders = (props) => {
                                 </div>
                                 <div>
                                         <div  >
-                                            {/* 18:00, 26 tháng 2 */}
                                         {addZero(row.createAt.toDate().getHours())}:
                                         {addZero(row.createAt.toDate().getMinutes())},{" "}
                                         {addZero(row.createAt.toDate().getDate())}{" "}tháng{" "}
                                         {addZero(row.createAt.toDate().getMonth() + 1)}
-                                        {/* {addZero(row.createAt.toDate().getFullYear())} */}
                                         </div>
                                         <Button style={style.btnXacnhan} variant="contained" onClick={() => orderConfirm(row.id)}>
                                             Xác nhận
@@ -98,8 +96,7 @@ const Orders = (props) => {
                             <hr height='100%' color="#CACFD2"/>
                         </div>
                         ): ""
-                        )
-                            })}
+                        )})}
                     </div>
                 </div>
             </div>
@@ -107,6 +104,13 @@ const Orders = (props) => {
     }
 
 const style = {
+    Tname:{
+        width:'70%',
+    },
+    Tprice: {
+        paddingLeft:'10px',
+        width:'30%',
+    },
     inlines: {
         display:'flex',
     },

@@ -21,7 +21,7 @@ import { ShoppingBagOutline } from '@useblu/ocean-icons-react';
 import { ViewListOutline } from '@useblu/ocean-icons-react';
 import { TicketOutline } from '@useblu/ocean-icons-react';
 import { Printer } from '@useblu/ocean-icons-react';
-
+import EqualizerIcon from '@mui/icons-material/Equalizer';
 
 const drawerWidth = 220;
 function Menu(props) {
@@ -78,6 +78,16 @@ function Menu(props) {
                   <Printer />
                 </ListItemIcon>
                 <div>Tạo mã QR</div>
+              </ListItemButton>
+            </ListItem>
+          </Link>
+          <Link to="/Statistical">
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <EqualizerIcon />
+                </ListItemIcon>
+                <div>Thống kê</div>
               </ListItemButton>
             </ListItem>
           </Link>

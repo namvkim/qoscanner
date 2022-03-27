@@ -19,7 +19,7 @@ const Orders = () => {
                 loading ? <LoadingComponent /> :
                 <div style={style.Container} > 
                     <div style={style.paperTitle} >
-                            <div style={style.Title}  >Orders</div>
+                            <div style={style.Title}>Đơn hàng</div>
                             <Stack direction="row" spacing={2} alignItems="center">
                             <div>John</div>                      
                             <Avatar alt="avatar restaurant" src="https://pdp.edu.vn/wp-content/uploads/2021/05/hinh-anh-dai-dien-avt-anime-1.jpg" />

@@ -77,10 +77,11 @@ const Chat =()=>{
             ...doc.data(),
           };
         })
-      // message.sort((start, end)=>)
-        setMessag(
-        message
-      );
+        let messageTrue = message.filter((item) => item.status === true);
+        messageTrue.sort((a, b)=>a.createAt-  b.createAt);
+        let messageFalse = message.filter((item) => item.status === false);
+        messageFalse.sort((a, b)=>b.createAt-a.createAt);
+        setMessag({ messageTrue: messageTrue, messageFalse: messageFalse });
     });
   };
 
@@ -123,18 +124,13 @@ const Chat =()=>{
         </Box>
         <TabPanel value={value} index={0}>
            <div style={style.scroll}>
-            {messag.map((row, index) => (
-            row.status===true ?(
-                <div  style={style.chat}>
+            {messag?.messageTrue?.map((row, index) => (
+                <div style={style.chat} key={index}>
                     <div style={style.inline}>
                         <div><b>{row.table} </b></div>
                         <div>
-                          {/* 19:05 */}
                             {addZero(row.createAt.toDate().getHours())}:
-                            {addZero(row.createAt.toDate().getMinutes())}{" "}
-                            {/* {addZero(row.createAt.toDate().getDate())}- */}
-                            {/* {addZero(row.createAt.toDate().getMonth() + 1)} */}
-                            {/* {addZero(row.createAt.toDate().getFullYear())} */}
+                            {addZero(row.createAt.toDate().getMinutes())}
                       </div>
                     </div>
                     <div style={style.mesdone}>
@@ -144,26 +140,26 @@ const Chat =()=>{
                          ><DoneIcon /></Button>
                     </div>
                 </div> 
-                )  :  ""
                 ))}
            </div>
         </TabPanel>
         <TabPanel value={value} index={1}>
             <div style={style.scroll}>
-            {messag.map((row, index) => (
-                row.status===false ?(
+            {messag?.messageFalse?.map((row, index) => (
                 <div key={index} style={style.chat}>
                     <div style={style.inline}>
                         <div><b>{row.table} </b> </div>
-                        <div>9:15</div>
+                        <div>
+                          {addZero(row.createAt.toDate().getHours())}:
+                          {addZero(row.createAt.toDate().getMinutes())}{" "}
+                        </div>
                     </div>
                     <div style={style.mesdone}>
                         <div>{row.content}</div>
-                        <Button size="small"  
-                         ><CheckCircleOutlineIcon /></Button>
+                        <CheckCircleOutlineIcon size="small"  style={style.mesdoneColor}  />
                     </div>
                 </div> 
-                 ):""))}
+                 ))}
             </div>
         </TabPanel>
         </Box>
@@ -172,6 +168,9 @@ const Chat =()=>{
 }
 
 const style = {
+  mesdoneColor: {
+    color:'#1976d2',
+  },
     container: {
         backgroundColor: '#ffff',
         margin:'16px',
