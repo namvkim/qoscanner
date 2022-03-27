@@ -77,14 +77,29 @@ const CreateQRCode = (props) => {
       name: Yup.string().required("Nhập vào tên bàn"),
     }),
     onSubmit: (values) => {
-      setLoading(true);
+      
       const newQrCode = {
         name: values.name,
       };
-      console.log("kt:" + newQrCode);
+      console.log("nhap :" + values.name);
+      var status = false;
       try {
+        
+        for (const [index, value] of qrs.entries()) {
+          if(values.name == qrs[index].name){
+            console.log("get :" + qrs[index].name);
+                status = true;
+                break;
+          }
+        }
+        if( status === true) {
+          setMessage({ error: false, msg: "Mã QrCode này đã có!" });
+        }
+        else {
           QrCodeDataService.addQrCode(newQrCode);
           setMessage({ error: false, msg: "Thêm mã QrCode thành công!" });
+        }
+
       } catch (err) {
         setMessage({ error: true, msg: err.message });
       }

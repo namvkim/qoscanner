@@ -67,8 +67,8 @@ import {
           label: "Tháng",
         },
       ];
-      let orders = 0;
-      let priceTotal = 0;
+      var orders = 0;
+      var priceTotal = 0;
      
     return (
         loading ? <LoadingComponent /> :
