@@ -9,37 +9,83 @@ import {
   doc,
 } from "firebase/firestore";
 
-
-const menuCollectionRef = collection(db, "restaurant"); 
+const menuCollectionRef = collection(db, "restaurant");
 class MenuDataService {
   addMenus = (newMenu) => {
-    const idRestaurant = auth.currentUser.uid;
-    return addDoc(collection(menuCollectionRef, idRestaurant,'menu'), newMenu);
+    const idRestaurant = auth.currentUser.uid; // lấy user id
+    return addDoc(collection(menuCollectionRef, idRestaurant, "menu"), newMenu);
   };
 
   updateMenu = (id, updateMenu) => {
-    const menuDoc = doc(db, "restaurant", "jicVmZc9Iu83NiLVHmFy", id);
+    const idRestaurant = auth.currentUser.uid;
+    const menuDoc = doc(
+      collection(menuCollectionRef, idRestaurant, "menu"),
+      id
+    );
     return updateDoc(menuDoc, updateMenu);
   };
-
   deleteMenu = (id) => {
-    const menuDoc = doc(collection(menuCollectionRef, 'menu'), id);
+    const idRestaurant = auth.currentUser.uid;
+    const menuDoc = doc(
+      collection(menuCollectionRef, idRestaurant, "menu"),
+      id
+    );
     return deleteDoc(menuDoc);
   };
 
-  getAllMenus = () => {
-    return getDocs(collection(menuCollectionRef, 'menu'));
+  addCategories = (newCategory) => {
+    const idRestaurant = auth.currentUser.uid; // lấy user id
+    return addDoc(
+      collection(menuCollectionRef, idRestaurant, "category"),
+      newCategory
+    );
   };
-  getMenu= (id) => {
-    const menuDoc = doc(db, "restaurant", "jicVmZc9Iu83NiLVHmFy", id);
+
+  updateCategory = (newCategory) => {
+    const { id, ...Category } = newCategory;
+    const idRestaurant = auth.currentUser.uid;
+    const cateDoc = doc(
+      collection(menuCollectionRef, idRestaurant, "category"),
+      id
+    );
+    return updateDoc(cateDoc, Category);
+  };
+
+  deleteCategory = (id) => {
+    const idRestaurant = auth.currentUser.uid;
+    const cateDoc = doc(
+      collection(menuCollectionRef, idRestaurant, "category"),
+      id
+    );
+    return deleteDoc(cateDoc);
+  };
+  deleteAllCategory = () => {
+    const idRestaurant = auth.currentUser.uid;
+    const cateDoc = doc(
+      collection(menuCollectionRef, idRestaurant, "category")
+    );
+    return deleteDoc(cateDoc);
+  };
+
+  getAllMenus = () => {
+    return getDocs(collection(menuCollectionRef, "menu"));
+  };
+  getMenu = (id) => {
+    const idRestaurant = auth.currentUser.uid;
+    const menuDoc = doc(
+      collection(menuCollectionRef, idRestaurant, "menu"),
+      id
+    );
     return getDoc(menuDoc);
   };
-
-  getCategory = () => {
-    const categoryDoc = doc(db, "restaurant", "jicVmZc9Iu83NiLVHmFy", );
-    return getDoc(categoryDoc);
+  getCategory = (id) => {
+    const idRestaurant = auth.currentUser.uid;
+    const cateDoc = doc(
+      collection(menuCollectionRef, idRestaurant, "category"),
+      id
+    );
+    return getDoc(cateDoc);
   };
-
 }
 
 export default new MenuDataService();

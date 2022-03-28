@@ -1,87 +1,92 @@
-import * as React from 'react';
-import  { useState, useEffect } from "react";
-import PropTypes from 'prop-types';
-import { alpha } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import Switch from '@mui/material/Switch';
-import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { visuallyHidden } from '@mui/utils';
-import ModeEditOutlinedIcon from '@mui/icons-material/ModeEditOutlined';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { InputBase } from '@mui/material';
-import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import { withStyles } from "@material-ui/core/styles";
+import * as React from "react";
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import {
+  alpha,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Toolbar,
+  TableSortLabel,
+  Paper,
+  Checkbox,
+  IconButton,
+  Switch,
+  Tooltip,
+  InputBase,
+  Button,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import { visuallyHidden } from "@mui/utils";
+import ModeEditOutlinedIcon from "@mui/icons-material/ModeEditOutlined";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 import MenuDataService from "../services/menu.service";
-import {collection,doc,  onSnapshot} from 'firebase/firestore';
-import {db} from '../firebase';
-import Button from '@mui/material/Button';
-
+import { collection, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../firebase";
 
 const headCells = [
   {
-    id: 'name',
+    id: "name",
     numeric: false,
     disablePadding: true,
-    label: 'Tên món ăn',
+    label: "Tên món ăn",
   },
   {
-    id: 'image',
+    id: "image",
     numeric: true,
     disablePadding: false,
-    label: 'Hình ảnh',
+    label: "Hình ảnh",
   },
   {
-    id: 'categories',
+    id: "categories",
     numeric: true,
     disablePadding: false,
-    label: 'Danh mục',
+    label: "Danh mục",
   },
   {
-    id: 'price',
+    id: "price",
     numeric: true,
     disablePadding: false,
-    label: 'Giá(VNĐ)',
+    label: "Giá(VNĐ)",
   },
 
   {
-    id: 'status',
+    id: "status",
     numeric: true,
     disablePadding: false,
-    label: 'Trạng thái',
+    label: "Trạng thái",
   },
   {
-    id: 'edit',
+    id: "edit",
     numeric: true,
     disablePadding: false,
-    label: 'Sửa',
+    label: "Sửa",
   },
   {
-    id: 'delete',
+    id: "delete",
     numeric: true,
     disablePadding: false,
-    label: 'Xóa',
+    label: "Xóa",
   },
- 
 ];
 
 function ShowMenuHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
-    props;
+  const {
+    onSelectAllClick,
+    order,
+    orderBy,
+    numSelected,
+    rowCount,
+    onRequestSort,
+  } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -96,27 +101,27 @@ function ShowMenuHead(props) {
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
             inputProps={{
-              'aria-label': 'select all desserts',
+              "aria-label": "select all desserts",
             }}
           />
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
+            align={headCell.numeric ? "right" : "left"}
+            padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
+              direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
-              style={{fontSize: "18px", fontWeight: "500"}}
+              style={{ fontSize: "18px", fontWeight: "500" }}
             >
               {headCell.label}
               {orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  {order === "desc" ? "sorted descending" : "sorted ascending"}
                 </Box>
               ) : null}
             </TableSortLabel>
@@ -131,15 +136,17 @@ ShowMenuHead.propTypes = {
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+  order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
 };
 
 const ShowMenuToolbar = (props) => {
   const { numSelected } = props;
-  
 
+  const deleteAll = async () => {
+    await MenuDataService.deleteAllCategory();
+  };
   return (
     <Toolbar
       sx={{
@@ -147,13 +154,16 @@ const ShowMenuToolbar = (props) => {
         pr: { xs: 1, sm: 1 },
         ...(numSelected > 0 && {
           bgcolor: (theme) =>
-            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+            alpha(
+              theme.palette.primary.main,
+              theme.palette.action.activatedOpacity
+            ),
         }),
       }}
     >
       {numSelected > 0 ? (
         <Typography
-          sx={{ flex: '1 1 100%' }}
+          sx={{ flex: "1 1 100%" }}
           color="inherit"
           variant="subtitle1"
           component="div"
@@ -162,34 +172,53 @@ const ShowMenuToolbar = (props) => {
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: '1 1 100%' }}
+          sx={{ flex: "1 1 100%" }}
           variant="h6"
           id="tableTitle"
           component="div"
         >
-          <div  style={{display: 'flex', alignItems: 'center',  }} >
-                <Paper  style={numSelected.searchContainer}  
-                    sx={{ maxWidth:'60%', display: 'flex', alignItems: 'center', height: '40px',  boxShadow:'none' , border:'0.1px solid #CACFD2' }} >
-                    <InputBase  sx={{ ml: 1, flex: 1 ,  minWidth: '60%' }} placeholder="Tìm theo tên sản phẩm" 
-                           
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Paper
+              style={numSelected.searchContainer}
+              sx={{
+                maxWidth: "60%",
+                display: "flex",
+                alignItems: "center",
+                height: "40px",
+                boxShadow: "none",
+                border: "0.1px solid #CACFD2",
+              }}
+            >
+              <InputBase
+                sx={{ ml: 1, flex: 1, minWidth: "60%" }}
+                placeholder="Tìm theo tên sản phẩm"
+                inputProps={{ "aria-label": "Tìm kiếm" }}
+              />
 
-                        inputProps={{ 'aria-label': 'Tìm kiếm' }} />
-                        
-                    <IconButton type="submit"  aria-label="search">
-                      <SearchIcon />
-                    </IconButton>
-                </Paper>
-                <Paper sx={{ p: '7px 10px',ml:'20px', display: 'flex', alignItems: 'center' ,boxShadow:'none', border:'0.1px solid #CACFD2', borderRadius:'4px'}}>
-                    <ReplayOutlinedIcon />
-                </Paper>
+              <IconButton type="submit" aria-label="search">
+                <SearchIcon />
+              </IconButton>
+            </Paper>
+            <Paper
+              sx={{
+                p: "7px 10px",
+                ml: "20px",
+                display: "flex",
+                alignItems: "center",
+                boxShadow: "none",
+                border: "0.1px solid #CACFD2",
+                borderRadius: "4px",
+              }}
+            >
+              <ReplayOutlinedIcon />
+            </Paper>
           </div>
-
         </Typography>
       )}
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={(e) => deleteAll()}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -208,43 +237,61 @@ ShowMenuToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-const  ShowMenu = ({ getMenuId}) => {
-  
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('categories');
+const ShowMenu = ({ getMenuId }) => {
+  const [order, setOrder] = React.useState("asc");
+  const [orderBy, setOrderBy] = React.useState("categories");
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-
-
   const [menus, setMenus] = useState([]);
+  const menuCollectionRef = collection(db, "restaurant");
+  const resCollectionRef = collection(db, "restaurant");
 
-
-  const menuCollectionRef = doc(db, "restaurant", "jicVmZc9Iu83NiLVHmFy");
-  const getMenus = async () => {
-    onSnapshot(collection(menuCollectionRef, 'menu'), snapshot => {
-      setMenus(snapshot.docs.map(doc => {
+  const getCategories = async () => {
+    const idRestaurant = auth.currentUser.uid;
+    onSnapshot(
+      collection(resCollectionRef, idRestaurant, "category"),
+      (snapshot) => {
+        const result = snapshot.docs.map((doc) => {
           return {
-              id: doc.id,
-              ...doc.data() 
-          }
-      }))
-  })   
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+        getMenus(result);
+      }
+    );
+  };
+
+  const getMenus = async (cate2) => {
+    const idRestaurant = auth.currentUser.uid;
+    onSnapshot(
+      collection(menuCollectionRef, idRestaurant, "menu"),
+      (snapshot) => {
+        let result = snapshot.docs.map((doc) => {
+          var { name } = cate2.find((cate) => cate.id === doc.data().category);
+          return {
+            id: doc.id,
+            categoryName: name,
+            ...doc.data(),
+          };
+        });
+        result.sort((a, b) => b.createdAt - a.createdAt);
+        setMenus(result);
+      }
+    );
   };
 
   const deleteHandler = async (id) => {
     await MenuDataService.deleteMenu(id);
-    getMenus();
   };
 
-  
-  useEffect(() => {
-    getMenus();
+  useEffect(async () => {
+    await getCategories();
   }, []);
 
   const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
@@ -270,43 +317,40 @@ const  ShowMenu = ({ getMenuId}) => {
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
+        selected.slice(selectedIndex + 1)
       );
     }
 
     setSelected(newSelected);
   };
 
-
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  // Avoid a layout jump when reaching the last page with empty rows.
-  
-    const label = { inputProps: { 'aria-label': 'Switch demo' } };
+  const updateStatus = async (item) => {
+    const { id, status } = item;
+    await MenuDataService.updateMenu(id, { status: !status });
+  };
+
   return (
     <>
-    
-    <div  style={styles.listProduct} >
-      <Paper >
-        <ShowMenuToolbar numSelected={selected.length} />
-        <TableContainer  style={styles.scroll}  >
-          <Table
-            sx={{ minWidth: 650 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <ShowMenuHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={menus.length}
-            />
-            <TableBody>
-              {/* if you don't need to support IE11, you can replace the `stableSort` call with:
-                 rows.slice().sort(getComparator(order, orderBy)) */}
-             
+      <div style={styles.listProduct}>
+        <Paper>
+          <ShowMenuToolbar numSelected={selected.length} />
+          <TableContainer style={styles.scroll}>
+            <Table
+              sx={{ minWidth: 650 }}
+              aria-labelledby="tableTitle"
+              size={dense ? "small" : "medium"}
+            >
+              <ShowMenuHead
+                numSelected={selected.length}
+                order={order}
+                orderBy={orderBy}
+                onSelectAllClick={handleSelectAllClick}
+                onRequestSort={handleRequestSort}
+                rowCount={menus.length}
+              />
+              <TableBody>
                 {menus.map((row, index) => {
                   const isItemSelected = isSelected(row.name);
                   const labelId = `enhanced-table-checkbox-${index}`;
@@ -319,13 +363,13 @@ const  ShowMenu = ({ getMenuId}) => {
                       tabIndex={-1}
                       key={row.id}
                     >
-                      <TableCell padding="checkbox" >
+                      <TableCell padding="checkbox">
                         <Checkbox
                           color="primary"
                           checked={isItemSelected}
                           onClick={(event) => handleClick(event, row.name)}
                           inputProps={{
-                            'aria-labelledby': labelId,
+                            "aria-labelledby": labelId,
                           }}
                         />
                       </TableCell>
@@ -334,72 +378,68 @@ const  ShowMenu = ({ getMenuId}) => {
                         id={labelId}
                         scope="row"
                         padding="none"
-                        
                       >
                         {row.name}
                       </TableCell>
-                      <TableCell component="th" id={labelId} >
-                             <img  align="right" src={row.image} alt=""  height='50' width='60' style={{ borderRadius: "3px" }} />
+                      <TableCell component="th" id={labelId}>
+                        <img
+                          align="right"
+                          src={row.image}
+                          alt=""
+                          height="50"
+                          width="60"
+                          style={{ borderRadius: "3px" }}
+                        />
                       </TableCell>
-                      <TableCell align="right">{row.category}</TableCell>
+                      <TableCell align="right">{row.categoryName}</TableCell>
                       <TableCell align="right">{row.price}</TableCell>
-                     
+
                       <TableCell align="right">
-                        <Switch>{row.status} </Switch> 
-                      </TableCell>
-                      <TableCell align="right" >
-                          <Button 
-                              variant="contained"
-                               
-                              onClick={(e) => getMenuId(row.id)}
-                            
-                            >
-                              <ModeEditOutlinedIcon/> 
-                            </Button>
-                      </TableCell>
-                      <TableCell align="right">
-                          <Button 
-                              variant="contained"
-                              color="error"
-                              onClick={(e) => deleteHandler(row.id)}
-                            >
-                            <DeleteOutlinedIcon color="red"/> 
-                            
-                          </Button>
-                                            
+                        <Switch
+                          checked={row.status}
+                          onChange={() => updateStatus(row)}
+                        ></Switch>
                       </TableCell>
 
+                      <TableCell align="right">
+                        <Button
+                          variant="contained"
+                          onClick={(e) => getMenuId(row.id)}
+                        >
+                          <ModeEditOutlinedIcon />
+                        </Button>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Button
+                          variant="contained"
+                          color="error"
+                          onClick={(e) => deleteHandler(row.id)}
+                        >
+                          <DeleteOutlinedIcon color="red" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
-              
-            </TableBody>
-          </Table>
-        </TableContainer>
-    
-      </Paper>
-      
-    </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </div>
     </>
   );
-}
+};
 const styles = {
- 
   scroll: {
-    width: '100%',
-    height: 'calc(100vh - 435px)',
-    overflowY: 'scroll',
+    width: "100%",
+    height: "calc(100vh - 435px)",
+    overflowY: "scroll",
   },
-  listProduct: { 
-    padding: '15px',
-    backgroundColor:'#FFFFFF',
-    margin:'15px 15px',
-    
-    
+  listProduct: {
+    padding: "15px",
+    backgroundColor: "#FFFFFF",
+    margin: "15px 15px",
   },
-
- 
-
 };
 
 export default ShowMenu;
