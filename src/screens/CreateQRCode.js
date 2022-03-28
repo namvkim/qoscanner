@@ -21,7 +21,7 @@ import {
   Checkbox
 } from "@mui/material";
 import * as Yup from "yup";
-import QRCode from "qrcode.react";
+import QRCode, { displayName } from "qrcode.react";
 import PropTypes from "prop-types";
 import { useFormik } from "formik";
 import { db, auth } from "../firebase";
@@ -40,6 +40,7 @@ const CreateQRCode = (props) => {
   const [qrs, setQrs] = useState([]);
 
   const idRestaurant = auth.currentUser.uid;
+  const nameUser =  auth.currentUser.displayName;
   const qrCodeCollectionRef = collection(
     db,
     "restaurant",
@@ -48,14 +49,14 @@ const CreateQRCode = (props) => {
   );
   const getQrs = async () => {
     onSnapshot(qrCodeCollectionRef, (snapshot) => {
-      setQrs(
-        snapshot.docs.map((doc) => {
-          return {
-            id: doc.id,
-            ...doc.data(),
-          };
-        })
-      );
+      let qr = snapshot.docs.map((doc) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      })
+      qr.sort((a, b)=>a.createAt - b.createAt);
+      setQrs( qr );
     });
   };
 
@@ -80,26 +81,24 @@ const CreateQRCode = (props) => {
       
       const newQrCode = {
         name: values.name,
+        createAt: new Date(),
       };
-      console.log("nhap :" + values.name);
       var status = false;
       try {
-        
-        for (const [index, value] of qrs.entries()) {
-          if(values.name == qrs[index].name){
-            console.log("get :" + qrs[index].name);
-                status = true;
-                break;
+        for (const [index] of qrs.entries()) {
+          if(values.name === qrs[index].name){
+              status = true;
+              break;
           }
         }
         if( status === true) {
-          setMessage({ error: false, msg: "Mã QrCode này đã có!" });
+          setMessage({ error: true, msg: "Mã QrCode này đã có!" });
         }
         else {
           QrCodeDataService.addQrCode(newQrCode);
+          formik.values.name="";
           setMessage({ error: false, msg: "Thêm mã QrCode thành công!" });
         }
-
       } catch (err) {
         setMessage({ error: true, msg: err.message });
       }
@@ -151,14 +150,15 @@ const CreateQRCode = (props) => {
       <div className={classes.paperTitle}>
         <div className={classes.Title}>Tạo mã QR</div>
         <Stack direction="row" spacing={2} alignItems="center">
-          <div>John Smith</div>
-          <Avatar alt="avatar restaurant" src="./images/account.jpg" />
+          <div >
+            {nameUser} 
+          </div>
+          <Avatar alt="avatar restaurant" src="./images/account-icon.png" />
         </Stack>
       </div>
       {message?.msg && (
         <Alert
           variant={message?.error ? "danger" : "success"}
-          dismissible
           onClose={() => setMessage("")}
         >
           {message?.msg}

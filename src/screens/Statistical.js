@@ -15,25 +15,32 @@ import {
     TextField,
   } from "@mui/material";
     import { db, auth } from "../firebase";
-    import {collection, onSnapshot } from "firebase/firestore";
+    import {collection, onSnapshot, query, where  } from "firebase/firestore";
     import SearchIcon from "@mui/icons-material/Search";
     
     const Statistical = () => {
     const [loading, setLoading] = useState(true);
     const [order, setOrder] = useState([]);
     const idRestaurant = auth.currentUser.uid;
+    const nameUser =  auth.currentUser.displayName;
     const orderCollectionRef = collection(
     db, 
     "restaurant",
     idRestaurant,
     "order"
     );
+    // var startOfToday = new Date(); 
+    //     startOfToday.setHours(0,0,0,0);
+    // var endOfToday = new Date(); 
+    //     endOfToday.setHours(23,59,59,999);
     useEffect(() => {
         setLoading(false);
         getOrder();
     }, []);
+    // const day =  query(orderCollectionRef,where("createAt",">=",startOfToday, "and","createAt", "<=", endOfToday ));
     const getOrder = async () => {
         onSnapshot(orderCollectionRef, (snapshot) => {
+
             let order = snapshot.docs.map((doc) => {
               return {
                 id: doc.id,
@@ -76,8 +83,8 @@ import {
                 <div style={style.paperTitle} >
                             <div style={style.Title}>Thống kê</div>
                             <Stack direction="row" spacing={2} alignItems="center">
-                            <div>John</div>                      
-                            <Avatar alt="avatar restaurant" src="https://pdp.edu.vn/wp-content/uploads/2021/05/hinh-anh-dai-dien-avt-anime-1.jpg" />
+                            <div>{nameUser}</div>                      
+                            <Avatar alt="avatar restaurant" src="./images/account-icon.png" />
                         </Stack>
                 </div>
                 <div style={style.paperContainer2}>

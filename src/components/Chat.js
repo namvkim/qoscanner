@@ -104,17 +104,6 @@ const Chat =()=>{
   return (
     loading ? <LoadingComponent /> :
     <div  style={style.container}>
-        <div style={style.inline}>
-            <Paper   
-                sx={{ maxWidth:'60%', display: 'flex', alignItems: 'center', height: '40px',  boxShadow:'none' , border:'0.1px solid #CACFD2' }} >
-                <InputBase  sx={{ ml: 1, flex: 1 ,  minWidth: '60%' }} placeholder="Tìm tên bàn" 
-                    inputProps={{ 'aria-label': 'Tìm kiếm' }} />
-                <IconButton type="submit"  aria-label="search">
-                    <SearchIcon />
-                </IconButton>
-            </Paper>
-           <img width= "28" height="28" alt='icon image layer'  src='./images/Layer.png'/>
-        </div>
         <Box sx={{ width: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">

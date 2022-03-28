@@ -2,10 +2,11 @@ import {React, useState, useEffect} from "react";
 import PropTypes from 'prop-types';
 import {db, auth} from "../firebase";
 import {Button } from "@mui/material";
+
 import ClearIcon from '@mui/icons-material/Clear';
 import { withStyles } from "@material-ui/core/styles";
 import ChatDataService from "../services/chat.service";
-import {collection, onSnapshot } from "firebase/firestore";
+import {collection, onSnapshot} from "firebase/firestore";
 import LoadingComponent from "../components/LoadingComponent";
 
 const Orders = (props) => {
@@ -13,13 +14,8 @@ const Orders = (props) => {
     const { classes } = props;
     const idRestaurant = auth.currentUser.uid;
     const [order, setOrder] = useState([]);
-    const orderCollectionRef = collection(
-      db,
-      "restaurant",
-      idRestaurant,
-      "order"
-    );
-   
+    const orderCollectionRef =  collection( db, "restaurant", idRestaurant, "order") ;
+
     function addZero(i) {
         if (i < 10) {i = "0" + i}
         return i;

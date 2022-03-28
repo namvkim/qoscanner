@@ -4,6 +4,7 @@ import {
     useEffect 
 } from "react";
 import Chat from "../components/Chat";
+import { db, auth } from "../firebase";
 import Stack from '@mui/material/Stack';
 import Order from "../components/Order";
 import Avatar from '@mui/material/Avatar';
@@ -11,6 +12,7 @@ import LoadingComponent from "../components/LoadingComponent";
 
 const Orders = () => {
     const [loading, setLoading] = useState(true);
+    const nameUser =  auth.currentUser.displayName;
 
     useEffect(() => {
         setLoading(false);
@@ -21,8 +23,8 @@ const Orders = () => {
                     <div style={style.paperTitle} >
                             <div style={style.Title}>Đơn hàng</div>
                             <Stack direction="row" spacing={2} alignItems="center">
-                            <div>John</div>                      
-                            <Avatar alt="avatar restaurant" src="https://pdp.edu.vn/wp-content/uploads/2021/05/hinh-anh-dai-dien-avt-anime-1.jpg" />
+                            <div>{nameUser}</div>                      
+                            <Avatar alt="avatar restaurant" src="./images/account-icon.png" />
                         </Stack>
                     </div>
                     <div  style={style.inlines}>
