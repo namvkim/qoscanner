@@ -33,40 +33,6 @@ class MenuDataService {
     return deleteDoc(menuDoc);
   };
 
-  addCategories = (newCategory) => {
-    const idRestaurant = auth.currentUser.uid; // lấy user id
-    return addDoc(
-      collection(menuCollectionRef, idRestaurant, "category"),
-      newCategory
-    );
-  };
-
-  updateCategory = (newCategory) => {
-    const { id, ...Category } = newCategory;
-    const idRestaurant = auth.currentUser.uid;
-    const cateDoc = doc(
-      collection(menuCollectionRef, idRestaurant, "category"),
-      id
-    );
-    return updateDoc(cateDoc, Category);
-  };
-
-  deleteCategory = (id) => {
-    const idRestaurant = auth.currentUser.uid;
-    const cateDoc = doc(
-      collection(menuCollectionRef, idRestaurant, "category"),
-      id
-    );
-    return deleteDoc(cateDoc);
-  };
-  deleteAllCategory = () => {
-    const idRestaurant = auth.currentUser.uid;
-    const cateDoc = doc(
-      collection(menuCollectionRef, idRestaurant, "category")
-    );
-    return deleteDoc(cateDoc);
-  };
-
   getAllMenus = () => {
     return getDocs(collection(menuCollectionRef, "menu"));
   };
@@ -77,14 +43,6 @@ class MenuDataService {
       id
     );
     return getDoc(menuDoc);
-  };
-  getCategory = (id) => {
-    const idRestaurant = auth.currentUser.uid;
-    const cateDoc = doc(
-      collection(menuCollectionRef, idRestaurant, "category"),
-      id
-    );
-    return getDoc(cateDoc);
   };
 }
 

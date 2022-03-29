@@ -1,5 +1,5 @@
 import { auth, db } from "../firebase";
-import { collection, addDoc, setDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, setDoc, updateDoc, doc } from "firebase/firestore";
 
 const infoCollectionRef = collection(db, "restaurant");
 class InfoDataService {

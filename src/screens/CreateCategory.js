@@ -30,7 +30,8 @@ import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import { db, auth } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import LoadingComponent from "../components/LoadingComponent";
-import MenuDataService from "../services/menu.service";
+import DialogComponent from "../components/DialogComponent";
+import CategoryDataService from "../services/category.service";
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import { useFormik } from "formik";
@@ -215,7 +216,6 @@ ShowMenuToolbar.propTypes = {
 
 const CreateCategory = (props) => {
   const { classes } = props;
-  const [loading, setLoading] = useState(true);
   const [categoryId, setCategoryId] = useState("");
   const [message, setMessage] = useState();
   const [dialog, setDialog] = useState(false);
@@ -224,6 +224,8 @@ const CreateCategory = (props) => {
   const [selected, setSelected] = useState([]);
   const [dense, setDense] = useState(false);
   const [categories, setCategories] = useState();
+  const [loading, setLoading] = useState(true);
+
   const idRestaurant = auth.currentUser.uid;
   const cateCollectionRef = collection(
     db,
@@ -242,11 +244,12 @@ const CreateCategory = (props) => {
       });
       result.sort((a, b) => b.createdAt - a.createdAt);
       setCategories(result);
+      setLoading(false);
     });
   };
 
   const deleteHandler = async (id) => {
-    await MenuDataService.deleteCategory(id);
+    await CategoryDataService.deleteCategory(id);
   };
 
   useEffect(() => {
@@ -277,15 +280,17 @@ const CreateCategory = (props) => {
 
       try {
         if (values.id === "") {
-          MenuDataService.addCategories(newCategory);
+          CategoryDataService.addCategories(newCategory);
           formik.values.name = "";
-          setDialog(true);
           setMessage({
             type: "success",
             message: "Thêm danh mục thành công!",
           });
+          setDialog(true);
+          setLoading(false);
+          console.log(loading);
         } else {
-          MenuDataService.updateCategory(values);
+          CategoryDataService.updateCategory(values);
           setCategoryId("");
           formik.values.name = "";
           formik.values.id = "";
@@ -294,6 +299,7 @@ const CreateCategory = (props) => {
             message: "Cập nhật danh mục thành công thành công!",
           });
           setDialog(true);
+          setLoading(false);
         }
       } catch (err) {
         setMessage({
@@ -344,7 +350,7 @@ const CreateCategory = (props) => {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  return !categories ? (
+  return loading && !categories ? (
     <LoadingComponent />
   ) : (
     <div className={classes.Container}>
@@ -450,6 +456,11 @@ const CreateCategory = (props) => {
           </Paper>
         </div>
       </div>
+      <DialogComponent
+        isOpen={dialog}
+        setDialog={setDialog}
+        authData={message}
+      />
     </div>
   );
 };

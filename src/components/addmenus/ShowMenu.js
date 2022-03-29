@@ -28,16 +28,16 @@ import ModeEditOutlinedIcon from "@mui/icons-material/ModeEditOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import MenuDataService from "../services/menu.service";
+import MenuDataService from "../../services/menu.service";
 import { collection, onSnapshot } from "firebase/firestore";
-import { db, auth } from "../firebase";
+import { db, auth } from "../../firebase";
 
 const headCells = [
   {
     id: "name",
     numeric: false,
     disablePadding: true,
-    label: "Tên món ăn",
+    label: "Tên sản phẩm",
   },
   {
     id: "image",

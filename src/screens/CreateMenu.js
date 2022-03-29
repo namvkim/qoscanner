@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import LoadingComponent from "../components/LoadingComponent";
-import FormAddMenu from "../components/FormAddMenu";
-import ShowMenu from "../components/ShowMenu";
+import FormAddMenu from "../components/addmenus/FormAddMenu";
+import ShowMenu from "../components/addmenus/ShowMenu";
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 

@@ -17,6 +17,7 @@ import {
 import { db, auth, storage } from "../firebase";
 import { collection, onSnapshot, doc } from "firebase/firestore";
 import LoadingComponent from "../components/LoadingComponent";
+import DialogComponent from "../components/DialogComponent";
 import InfoDataService from "../services/information.service";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { withStyles } from "@material-ui/core/styles";
@@ -33,6 +34,7 @@ const ResInformation = (props) => {
   const [info, setInfo] = useState("");
   const inputFile = useRef(null);
   const resCollectionRef = collection(db, "restaurant");
+
   const getInfo = () => {
     const idRestaurant = auth.currentUser.uid;
     onSnapshot(doc(resCollectionRef, idRestaurant), (doc) => {
@@ -80,7 +82,7 @@ const ResInformation = (props) => {
     }),
 
     onSubmit: (values) => {
-      // setLoading(true);
+      setLoading(true);
       const timestamp = new Date();
       /** @type {any} */
       const metadata = {
@@ -163,11 +165,11 @@ const ResInformation = (props) => {
           if (info) {
             InfoDataService.updateInfo(newInfo);
             setDialog(true);
-            // setLoading(false);
+            setLoading(false);
           } else {
             InfoDataService.addInfo(newInfo);
             setDialog(true);
-            // setLoading(false);
+            setLoading(false);
           }
         } catch (err) {
           setMessage({
@@ -176,7 +178,7 @@ const ResInformation = (props) => {
           });
           console.log(err);
           setDialog(true);
-          // setLoading(false);
+          setLoading(false);
         }
       }
     },
@@ -371,6 +373,11 @@ const ResInformation = (props) => {
           </Grid>
         </Grid>
       </Box>
+      <DialogComponent
+        isOpen={dialog}
+        setDialog={setDialog}
+        authData={message}
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { auth, db, storage } from "../firebase";
+import { auth, db, storage } from "../../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
-import MenuDataService from "../services/menu.service";
+import MenuDataService from "../../services/menu.service";
 import {
   TextField,
   Button,
@@ -12,11 +12,11 @@ import {
   Stack,
   Select,
 } from "@mui/material";
-
 import { useFormik } from "formik";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import * as Yup from "yup";
-import DialogComponent from "./DialogComponent";
+import DialogComponent from "../DialogComponent";
+import LoadingComponent from "../LoadingComponent";
 
 const FormAddMenu = ({ id, setMenuId }) => {
   const [image, setImage] = useState(null);
@@ -24,7 +24,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
   const [message, setMessage] = useState();
   const [categories, setCategories] = useState([]);
   const resCollectionRef = collection(db, "restaurant");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const getCategories = async () => {
     const idRestaurant = auth.currentUser.uid;
@@ -39,6 +39,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
         });
         result.sort((a, b) => b.createAt - a.createAt);
         setCategories(result);
+        setLoading(false);
       }
     );
   };
@@ -72,6 +73,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
     }),
 
     onSubmit: (values) => {
+      setLoading(true);
       const timestamp = new Date();
 
       /** @type {any} */
@@ -83,7 +85,6 @@ const FormAddMenu = ({ id, setMenuId }) => {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 
@@ -133,6 +134,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
                 formik.values.category = "";
                 formik.values.description = "";
                 setDialog(true);
+                setLoading(false);
               } else {
                 MenuDataService.addMenus(newMenu);
                 setMessage({
@@ -145,6 +147,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
                 formik.values.category = "";
                 formik.values.description = "";
                 setDialog(true);
+                setLoading(false);
               }
             } catch (err) {
               setMessage({
@@ -153,6 +156,7 @@ const FormAddMenu = ({ id, setMenuId }) => {
               });
               console.log(err);
               setDialog(true);
+              setLoading(false);
             }
           });
         }
@@ -173,7 +177,6 @@ const FormAddMenu = ({ id, setMenuId }) => {
     setMessage("");
     try {
       const docSnap = await MenuDataService.getMenu(id);
-      console.log("The record is :", docSnap.data());
       formik.values.id = docSnap.data().id;
       formik.values.name = docSnap.data().name;
       formik.values.price = docSnap.data().price;
@@ -192,7 +195,10 @@ const FormAddMenu = ({ id, setMenuId }) => {
       editHandler();
     }
   }, [id]);
-  return (
+
+  return loading ? (
+    <LoadingComponent />
+  ) : (
     <>
       <div style={styles.headerAddMenu}>
         <div style={styles.headerTitle}>Tạo món</div>
