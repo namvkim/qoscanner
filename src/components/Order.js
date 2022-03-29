@@ -2,7 +2,6 @@ import {React, useState, useEffect} from "react";
 import PropTypes from 'prop-types';
 import {db, auth} from "../firebase";
 import {Button } from "@mui/material";
-
 import ClearIcon from '@mui/icons-material/Clear';
 import { withStyles } from "@material-ui/core/styles";
 import ChatDataService from "../services/chat.service";
@@ -53,8 +52,8 @@ const Orders = (props) => {
                         return (
                         row.status === true ? (
                         <div key={index}>
-                            <div style={style.order}>
-                                <div> 
+                            <div className={classes.order}>
+                                <div className={classes.orderContainer}> 
                                     <div style={style.tableName}>{row.table}</div>
                                     <div style={style.tableContent}>
                                         {row.data.map((item, index)=> {
@@ -78,15 +77,15 @@ const Orders = (props) => {
                                     </div>
                                 </div>
                                 <div>
-                                        <div  >
+                                    <div >
                                         {addZero(row.createAt.toDate().getHours())}:
                                         {addZero(row.createAt.toDate().getMinutes())},{" "}
                                         {addZero(row.createAt.toDate().getDate())}{" "}tháng{" "}
                                         {addZero(row.createAt.toDate().getMonth() + 1)}
-                                        </div>
-                                        <Button style={style.btnXacnhan} variant="contained" onClick={() => orderConfirm(row.id)}>
-                                            Xác nhận
-                                        </Button>
+                                    </div>
+                                    <Button style={style.btnXacnhan} variant="contained" onClick={() => orderConfirm(row.id)}>
+                                        Xác nhận
+                                    </Button>
                                 </div>
                             </div>
                             <hr height='100%' color="#CACFD2"/>
@@ -129,27 +128,12 @@ const style = {
         justifyContent:'space-between',
         borderBottom:' 1px solid #CFD2D4',
     },
-    tableContent: {
-        background: '#FFFFFF',
-        width:'80vh',
-        display:'flex',
-        flexFlow: 'column wrap',
-        border:"1px solid #CACFD2",
-        padding:'15px',
-    },
     tableName: {
         fontSize:'24px',
         fontWeight: 'bold',
         lineHeight: '28px',
         color: '#ECA64E',
     },
-    order:
-        {
-        display:'flex',
-        width:'100%',
-        justifyContent:'space-between',
-        padding:'15px',
-        },
     Container: {
         backgroundColor: '#E5E5E5',
     },
@@ -157,7 +141,15 @@ const style = {
         fontSize:'12px',
         color:'#424949',
     },
-    }
+    tableContent: {
+        background: '#FFFFFF',
+        width:'100%',
+        display:'flex',
+        flexFlow: 'column wrap',
+        border:"1px solid #CACFD2",
+        padding:'15px',
+    },
+}
     const styles = theme => ({
         scroll: {
             height:'calc(100vh - 95px)',
@@ -166,6 +158,21 @@ const style = {
             backgroundColor: '#ffff',
             marginLeft:'15px',
             width:'100%',
+        },
+        order:  {
+            display:'flex',
+            width:'100%',
+            justifyContent:'space-between',
+            padding:'15px',
+            [theme.breakpoints.down('sm')]: {
+                display:'block',
+              },
+        },
+        orderContainer: {
+            width:'60%',
+            [theme.breakpoints.down('sm')]: {
+                width:'100%', 
+              },
         },
     })
     
