@@ -21,6 +21,9 @@ import {
     const Statistical = () => {
     const [loading, setLoading] = useState(true);
     const [order, setOrder] = useState([]);
+    const [currency, setCurrency] = useState("all");
+    // const [status, setStatus] = useState("all");
+      
     const idRestaurant = auth.currentUser.uid;
     const nameUser =  auth.currentUser.displayName;
     const orderCollectionRef = collection(
@@ -29,18 +32,40 @@ import {
     idRestaurant,
     "order"
     );
+    // var currentday =new Date();
+    // var first = currentday.getDate() - currentday.getDay();  
+    // var last = first + 6;  
     // var startOfToday = new Date(); 
     //     startOfToday.setHours(0,0,0,0);
     // var endOfToday = new Date(); 
     //     endOfToday.setHours(23,59,59,999);
+    // var startOfWeek = new Date(currentday.setDate(first));
+    //     startOfWeek.setHours(0,0,0,0);
+    // var endOfWeek = new Date(currentday.setDate(last));
+    //     endOfWeek.setHours(23,59,59,999);
+    // var startOfMonth = new Date(currentday.getFullYear(), currentday.getMonth(), 1);
+    // var endOfMonth = new Date(currentday.getFullYear(), currentday.getMonth() + 1, 0);
+ 
     useEffect(() => {
         setLoading(false);
         getOrder();
     }, []);
     // const day =  query(orderCollectionRef,where("createAt",">=",startOfToday, "and","createAt", "<=", endOfToday ));
+    // const week =  query(orderCollectionRef,where("createAt",">=",startOfWeek, "and","createAt", "<=", endOfWeek ));
+    // const month =  query(orderCollectionRef,where("createAt",">=",startOfMonth, "and","createAt", "<=", endOfMonth ));
+    // var dt = [];
+    // if(status === "day") {
+    //     dt=day;
+    // }else if (status === "week") {
+    //     dt=week;
+    // }else if (status === "month") {
+    //     dt=month;
+    // }else {
+    //     dt=orderCollectionRef;
+    // }
     const getOrder = async () => {
-        onSnapshot(orderCollectionRef, (snapshot) => {
-
+        // onSnapshot(dt, (snapshot) => {
+            onSnapshot(orderCollectionRef, (snapshot) => {
             let order = snapshot.docs.map((doc) => {
               return {
                 id: doc.id,
@@ -51,10 +76,17 @@ import {
             setOrder( order );
         });
       };
-      const [currency, setCurrency] = useState("all");
-
       const handleChangeMa = (event) => {
         setCurrency(event.target.value);
+        // if(event.target.value === "day") {
+        //     setStatus("day");
+        // }else if (event.target.value === "week") {
+        //     setStatus("week");
+        // }else if (event.target.value === "month") {
+        //     setStatus("month");
+        // }else {
+        //     setStatus("all");
+        // }
       };
       const currencies = [
         {

@@ -52,10 +52,10 @@ const style = {
         borderBottom:' 1px solid #CFD2D4',
     },
     chat: {
-        width:'30%',
+        width:'40%',
     },
     order: {
-        width:'70%',
+        width:'80%',
     },
     Container: {
         backgroundColor: '#E5E5E5',

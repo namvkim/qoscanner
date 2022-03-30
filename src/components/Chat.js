@@ -1,18 +1,9 @@
-import {
-  Button,
-  InputBase,
-  Paper,
-  Tabs,
-  Tab,
-  Box,
-  IconButton,
-} from "@mui/material";
+import { Button, Tabs, Tab, Box } from "@mui/material";
 import * as React from "react";
 import PropTypes from "prop-types";
 import { db, auth } from "../firebase";
 import { useState, useEffect } from "react";
 import DoneIcon from "@mui/icons-material/Done";
-import SearchIcon from "@mui/icons-material/Search";
 import ChatDataService from "../services/chat.service";
 import LoadingComponent from "../components/LoadingComponent";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";

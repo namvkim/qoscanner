@@ -21,7 +21,8 @@ import {
   Checkbox
 } from "@mui/material";
 import * as Yup from "yup";
-import QRCode, { displayName } from "qrcode.react";
+import QRCode from "qrcode.react";
+import DialogComponent from "../components/DialogComponent";
 import PropTypes from "prop-types";
 import { useFormik } from "formik";
 import { db, auth } from "../firebase";
@@ -35,6 +36,7 @@ import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 
 const CreateQRCode = (props) => {
   const { classes } = props;
+  const [dialog, setDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ error: false, msg: "" });
   const [qrs, setQrs] = useState([]);
@@ -92,15 +94,28 @@ const CreateQRCode = (props) => {
           }
         }
         if( status === true) {
-          setMessage({ error: true, msg: "Mã QrCode này đã có!" });
+          formik.values.name="";
+          setMessage({
+            type: "error",
+            message: "Mã QrCode này đã có!",
+            });
+          setDialog(true);
         }
         else {
           QrCodeDataService.addQrCode(newQrCode);
           formik.values.name="";
-          setMessage({ error: false, msg: "Thêm mã QrCode thành công!" });
+          setMessage({  
+            type: "success",
+            message: "Thêm mã QrCode thành công!",
+           });
+          setDialog(true);
         }
       } catch (err) {
-        setMessage({ error: true, msg: err.message });
+        setMessage({ 
+            type: "error",
+            message: err.message,
+         });
+        setDialog(true);
       }
       setLoading(false);
     },
@@ -156,14 +171,6 @@ const CreateQRCode = (props) => {
           <Avatar alt="avatar restaurant" src="./images/account-icon.png" />
         </Stack>
       </div>
-      {message?.msg && (
-        <Alert
-          variant={message?.error ? "danger" : "success"}
-          onClose={() => setMessage("")}
-        >
-          {message?.msg}
-        </Alert>
-      )}
       <form className={classes.paperContainer} onSubmit={formik.handleSubmit}>
         <TextField
           size="small"
@@ -260,7 +267,7 @@ const CreateQRCode = (props) => {
                       <QRCode
                         id={row.id}
                         value={idRestaurant + "/" + row.name}
-                        size={450}
+                        size={350}
                         level={"H"} //Mức độ sửa chữa lỗi của QR code
                         includeMargin={true}
                       />
@@ -272,6 +279,11 @@ const CreateQRCode = (props) => {
           </Table>
         </TableContainer>
       </div>
+      <DialogComponent
+        isOpen={dialog}
+        setDialog={setDialog}
+        authData={message}
+      />
     </div>
   );
 };
